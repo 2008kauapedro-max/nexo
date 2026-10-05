@@ -3,17 +3,34 @@ import { useState, useTransition } from "react";
 import { submitActivity } from "@/app/actions/workspace";
 export function Activity({
   activity,
+  saved,
 }: {
-  activity: { id: string; kind: string; prompt: string };
+  activity: { id: string; kind: string; prompt: string; items?: string[] };
+  saved?: {
+    response: { value: string | boolean | string[] };
+    confidence: "sure" | "unsure" | "guess";
+    correct: boolean;
+    explanation: string;
+  };
 }) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(
+    typeof saved?.response.value === "string" ||
+      typeof saved?.response.value === "boolean"
+      ? String(saved.response.value)
+      : "",
+  );
+  const [ordered, setOrdered] = useState<string[]>(
+    Array.isArray(saved?.response.value)
+      ? saved.response.value
+      : activity.items || [],
+  );
   const [confidence, setConfidence] = useState<"sure" | "unsure" | "guess">(
-    "unsure",
+    saved?.confidence || "unsure",
   );
   const [feedback, setFeedback] = useState<{
     correct: boolean;
     explanation: string;
-  } | null>(null);
+  } | null>(saved || null);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
   return (
@@ -29,7 +46,11 @@ export function Activity({
             try {
               const r = await submitActivity(
                 activity.id,
-                activity.kind === "TRUE_FALSE" ? value === "true" : value,
+                activity.kind === "ORDERING"
+                  ? ordered
+                  : activity.kind === "TRUE_FALSE"
+                    ? value === "true"
+                    : value,
                 confidence,
               );
               if (r.error) setError(r.error);
@@ -42,7 +63,46 @@ export function Activity({
           });
         }}
       >
-        {activity.kind === "TRUE_FALSE" ? (
+        {activity.kind === "ORDERING" ? (
+          <fieldset className="ordering-options">
+            <legend>Use as setas para colocar os passos na ordem.</legend>
+            <ol>
+              {ordered.map((item, index) => (
+                <li key={item}>
+                  <span>{item}</span>
+                  <div className="toolbar">
+                    {[-1, 1].map((direction) => (
+                      <button
+                        key={direction}
+                        type="button"
+                        className="button small secondary"
+                        disabled={
+                          pending ||
+                          !!feedback ||
+                          index + direction < 0 ||
+                          index + direction >= ordered.length
+                        }
+                        aria-label={`${direction < 0 ? "Subir" : "Descer"} passo ${index + 1}`}
+                        onClick={() =>
+                          setOrdered((current) => {
+                            const next = [...current];
+                            [next[index], next[index + direction]] = [
+                              next[index + direction],
+                              next[index],
+                            ];
+                            return next;
+                          })
+                        }
+                      >
+                        {direction < 0 ? "↑" : "↓"}
+                      </button>
+                    ))}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </fieldset>
+        ) : activity.kind === "TRUE_FALSE" ? (
           <fieldset className="boolean-options">
             <legend>A afirmação está correta?</legend>
             {[
@@ -108,6 +168,12 @@ export function Activity({
                 : "Vamos olhar de outro jeito."}
             </strong>
             <p>{feedback.explanation}</p>
+            {!feedback.correct && confidence === "sure" && (
+              <p>
+                Você estava confiante, mas este ponto merece revisão. Tente
+                explicar o conceito com suas palavras antes de avançar.
+              </p>
+            )}
           </div>
         ) : (
           <button disabled={pending} className="button primary">

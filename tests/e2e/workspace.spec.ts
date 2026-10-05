@@ -60,12 +60,24 @@ test("lessons, notifications, settings and legal navigation work", async ({
   await page.locator(".lesson-list a").first().click();
   await expect(page.locator(".worked-example")).toBeVisible();
   const activity = page.locator(".activity").first();
-  await activity.getByLabel("Sua resposta", { exact: true }).fill("1");
-  await activity
-    .getByRole("button", { name: "Verificar meu entendimento" })
-    .click();
+  if (await activity.getByLabel("Sua resposta", { exact: true }).isEnabled()) {
+    await activity.getByLabel("Sua resposta", { exact: true }).fill("1");
+    await activity
+      .getByRole("button", { name: "Verificar meu entendimento" })
+      .click();
+  }
   await expect(activity.getByRole("status")).toBeVisible();
   await expect(activity.getByRole("alert")).toHaveCount(0);
+  await page.reload();
+  await expect(
+    page.locator(".activity").first().getByRole("status"),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(".activity")
+      .first()
+      .getByLabel("Sua resposta", { exact: true }),
+  ).toBeDisabled();
   for (const route of [
     "/notificacoes",
     "/mapa",
@@ -79,7 +91,9 @@ test("lessons, notifications, settings and legal navigation work", async ({
   ]) {
     await page.goto(route);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByText("Algo saiu do ritmo.")).toHaveCount(0);
+    await expect(page.getByText("Não conseguimos carregar agora.")).toHaveCount(
+      0,
+    );
   }
   await page.goto("/configuracoes/notificacoes");
   await page.getByLabel("Estudos e revisões").uncheck();

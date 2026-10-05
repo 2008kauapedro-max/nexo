@@ -40,17 +40,20 @@ export default async function AdminPage() {
           <p>Revise, publique e organize o banco de questões.</p>
         </div>
       </div>
-      {role === "SUPER_ADMIN" && (
+      <details className="panel">
+        <summary>Outras áreas de administração</summary>
+        {role === "SUPER_ADMIN" && (
+          <nav className="workspace-links">
+            <Link href="/admin/financeiro">Financeiro</Link>
+            <Link href="/admin/saude">Saúde da plataforma</Link>
+          </nav>
+        )}
         <nav className="workspace-links">
-          <Link href="/admin/financeiro">Financeiro</Link>
-          <Link href="/admin/saude">Saúde da plataforma</Link>
+          <Link href="/admin/relatos">Relatos dos alunos</Link>
+          <Link href="/admin/fabrica">Fábrica de questões</Link>
+          <Link href="/admin/qualidade">Qualidade</Link>
         </nav>
-      )}
-      <nav className="workspace-links">
-        <Link href="/admin/relatos">Relatos dos alunos</Link>
-        <Link href="/admin/fabrica">Fábrica de questões</Link>
-        <Link href="/admin/qualidade">Qualidade</Link>
-      </nav>
+      </details>
       <Admin
         subjects={subjects || []}
         topics={topics || []}

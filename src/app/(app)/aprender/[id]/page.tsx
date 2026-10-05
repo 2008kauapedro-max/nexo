@@ -12,18 +12,49 @@ export default async function Lesson({
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const { db } = await requireProfile();
-  const { data: l } = await db
+  const { data: l, error: lessonError } = await db
     .from("lessons")
     .select("*,topics(subject_id,name)")
     .eq("id", id)
     .maybeSingle();
+  if (lessonError) throw lessonError;
   if (!l) notFound();
   const { data: activities, error } = await db
     .from("learning_activities")
     .select("*")
     .eq("lesson_id", id)
+    .in("kind", [
+      "TRUE_FALSE",
+      "NUMERIC_INPUT",
+      "SHORT_ANSWER",
+      "FILL_BLANK",
+      "ORDERING",
+    ])
     .order("position");
   if (error) throw error;
+  const { data: feedback, error: feedbackError } = await db.rpc(
+    "activity_feedback",
+    { p_lesson: id },
+  );
+  if (feedbackError) throw feedbackError;
+  const saved = z
+    .array(
+      z.object({
+        activity_id: z.string(),
+        response: z.object({
+          value: z.union([
+            z.string(),
+            z.number().transform(String),
+            z.boolean(),
+            z.array(z.string()),
+          ]),
+        }),
+        confidence: z.enum(["sure", "unsure", "guess"]),
+        correct: z.boolean(),
+        explanation: z.string(),
+      }),
+    )
+    .parse(feedback);
   return (
     <article className="reading-container">
       <Link href="/aprender" className="text-link">
@@ -41,9 +72,24 @@ export default async function Lesson({
         <span className="eyebrow">UM EXEMPLO</span>
         <p>{l.example}</p>
       </section>
-      {activities.map((a) => (
-        <Activity activity={a} key={a.id} />
-      ))}
+      {activities.map((a) => {
+        const payload = z
+          .object({ items: z.array(z.string().min(1).max(500)).min(2).max(10) })
+          .safeParse(a.payload);
+        if (a.kind === "ORDERING" && !payload.success) return null;
+        return (
+          <Activity
+            activity={{
+              id: a.id,
+              kind: a.kind,
+              prompt: a.prompt,
+              items: payload.success ? payload.data.items : undefined,
+            }}
+            saved={saved.find((row) => row.activity_id === a.id)}
+            key={a.id}
+          />
+        );
+      })}
       <section className="lesson-next">
         <Link className="button secondary" href={`/provar/${id}`}>
           Me prove que aprendeu →

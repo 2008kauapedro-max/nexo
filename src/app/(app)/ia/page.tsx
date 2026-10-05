@@ -16,6 +16,14 @@ export default async function AI({
         </div>
       </div>
       <Tutor
+        enabled={
+          !!(
+            process.env.AI_BASE_URL &&
+            process.env.AI_MODEL &&
+            process.env.AI_API_KEY &&
+            process.env.SUPABASE_SECRET_KEY
+          )
+        }
         question={z.uuid().safeParse(p.questao).success ? p.questao : undefined}
         session={z.uuid().safeParse(p.sessao).success ? p.sessao : undefined}
       />

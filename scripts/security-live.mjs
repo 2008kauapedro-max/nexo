@@ -2,6 +2,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import assert from "node:assert/strict";
 process.loadEnvFile(".env.local");
+assert.equal(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  "https://jseljonjvpkurvhwqsjh.supabase.co",
+  "This audit is scoped exclusively to NEXO",
+);
 const users = JSON.parse(readFileSync(".local/qa-users.json", "utf8"));
 const clients = [];
 const results = [];

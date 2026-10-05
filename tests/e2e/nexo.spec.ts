@@ -188,12 +188,17 @@ test("real study flow, feedback, result, AI unavailable, export and logout", asy
     fullPage: true,
   });
   await page.goto("/ia");
-  await page
-    .getByRole("button", { name: "Me dê uma dica", exact: true })
-    .click();
-  await expect(page.locator("main [role=alert]")).toContainText(
+  await expect(
+    page.getByRole("button", { name: "Me dê uma dica", exact: true }),
+  ).toBeDisabled();
+  await expect(page.locator("main [role=status]")).toContainText(
     "ainda está sendo conectado",
   );
+  const unavailable = await page.request.post("/api/tutor", {
+    headers: { origin: new URL(page.url()).origin },
+    data: { prompt: "Explique uma equação" },
+  });
+  expect(unavailable.status()).toBe(503);
   await page.goto("/perfil");
   const download = page.waitForEvent("download");
   await page.getByRole("link", { name: "Baixar meus dados" }).click();
@@ -215,6 +220,10 @@ test("simulation limit, ordinary user admin denial and actual admin access", asy
   await expect(page.locator("main [role=alert]")).toContainText(
     "até 10 questões",
   );
+  await page.evaluate(() => {
+    localStorage.setItem("role", "SUPER_ADMIN");
+    localStorage.setItem("plan", "premium");
+  });
   await page.goto("/admin");
   await expect(page.getByRole("heading")).toContainText(
     "Este caminho ainda não existe",

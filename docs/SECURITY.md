@@ -46,6 +46,7 @@ Referências dos advisors: [SECURITY DEFINER](https://supabase.com/docs/guides/d
 
 ## Auditoria complementar de 04/10/2026
 
-Histórico remoto e arquivos locais: nove migrations. Consulta aos catálogos confirmou RLS nas 30 tabelas públicas e nas seis privadas. Nenhuma função pública SECURITY DEFINER acessível a anon ou sem configuração explícita de search_path foi encontrada. Advisors: 25 avisos de RPCs autenticadas SECURITY DEFINER e um de senha vazada dependente de Pro; performance: 25 índices ainda sem uso, nível INFO. Sem upgrade ou alteração de custos.
+Histórico remoto e arquivos locais: dez migrations. Consulta aos catálogos confirmou RLS nas 30 tabelas públicas e nas seis privadas. Nenhuma função pública SECURITY DEFINER acessível a anon ou sem configuração explícita de search_path foi encontrada. Advisors: 26 avisos de RPCs autenticadas SECURITY DEFINER e um de senha vazada dependente de Pro; performance: 25 índices ainda sem uso, nível INFO. Sem upgrade ou alteração de custos.
 
 Testes adicionais exercitam FINANCE_ADMIN sem conteúdo/saúde, isolamento de notas/cartões/reflexões/plano, plano Premium válido versus expirado e roles forjadas em claims. Instrumentação registra rota, método, categoria e digest, sem cookies, cabeçalhos ou texto do aluno. O hook padrão do framework pode registrar o erro original: não lançar segredos como mensagem de erro.
+

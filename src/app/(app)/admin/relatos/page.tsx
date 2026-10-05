@@ -34,7 +34,7 @@ export default async function Reports() {
       </div>
       {reports.length ? (
         reports.map((r) => (
-          <article className="note" key={r.id}>
+          <article className="note" key={r.id} data-report-id={r.id}>
             <span className="eyebrow">
               {r.reason} · {r.status}
             </span>

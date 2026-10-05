@@ -56,6 +56,23 @@
   line-height: 18px;
   text-align: center;
 }
+.ordering-options {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.ordering-options ol {
+  padding-left: 24px;
+}
+.ordering-options li {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.ordering-options .toolbar {
+  margin-top: 8px;
+}
 .tabs,
 .workspace-links {
   display: flex;

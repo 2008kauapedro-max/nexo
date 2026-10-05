@@ -1222,6 +1222,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      activity_feedback: {
+        Args: { p_lesson: string }
+        Returns: Json
+      }
       admin_catalog: {
         Args: {
           p_id?: string

@@ -19,3 +19,12 @@ with a as(insert into public.learning_activities(lesson_id,kind,prompt,difficult
 insert into public.lessons(topic_id,title,explanation,example,status) select t.id,'Escala: do mapa ao espaço','A escala expressa a relação entre uma distância no mapa e a correspondente distância real, usando a mesma unidade. Em 1:100.000, 1 cm representa 100.000 cm.','100.000 cm equivalem a 1.000 m, ou 1 km. Portanto, 2 cm nesse mapa representam 2 km.','published' from public.topics t join public.subjects s on s.id=t.subject_id where s.slug='geografia' on conflict(topic_id,title) do nothing;
 with a as(insert into public.learning_activities(lesson_id,kind,prompt,difficulty,position,status) select id,'NUMERIC_INPUT','Em escala 1:50.000, uma distância de 4 cm representa quantos quilômetros?',4,0,'published' from public.lessons l where title='Escala: do mapa ao espaço' and not exists(select 1 from public.learning_activities x where x.lesson_id=l.id and x.position=0) returning id) insert into private.activity_keys select id,'{"value":2,"tolerance":0.001}'::jsonb,'4 × 50.000 = 200.000 cm = 2.000 m = 2 km.' from a;
 with a as(insert into public.learning_activities(lesson_id,kind,prompt,difficulty,position,status) select id,'TRUE_FALSE','Escala 1:100.000 significa que 1 cm no mapa representa 1 km no espaço real.',4,1,'published' from public.lessons l where title='Escala: do mapa ao espaço' and not exists(select 1 from public.learning_activities x where x.lesson_id=l.id and x.position=1) returning id) insert into private.activity_keys select id,'{"value":true,"tolerance":0.001}'::jsonb,'A afirmação corresponde ao conceito apresentado.' from a;
+with a as (
+ insert into public.learning_activities(lesson_id,kind,prompt,payload,difficulty,position,status)
+ select id,'ORDERING','Organize os passos para resolver 2x + 6 = 14.',
+ '{"items":["x = 4","2x + 6 = 14","2x = 8"]}'::jsonb,3,2,'published'
+ from public.lessons l where title='Equações: mantenha os dois lados em equilíbrio'
+ and not exists(select 1 from public.learning_activities x where x.lesson_id=l.id and x.position=2)
+ returning id
+) insert into private.activity_keys select id,'{"value":["2x + 6 = 14","2x = 8","x = 4"]}'::jsonb,
+ 'Parta da equação original. Subtraia 6 dos dois lados e, depois, divida ambos por 2.' from a;

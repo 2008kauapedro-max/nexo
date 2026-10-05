@@ -4,9 +4,11 @@ import { Sparkles, ArrowUp } from "lucide-react";
 export function Tutor({
   question,
   session,
+  enabled,
 }: {
   question?: string;
   session?: string;
+  enabled: boolean;
 }) {
   const [prompt, setPrompt] = useState("");
   const [messages, setMessages] = useState<{ role: string; text: string }[]>(
@@ -15,6 +17,7 @@ export function Tutor({
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   async function send(text: string) {
+    if (!enabled || pending) return;
     setPending(true);
     setError("");
     try {
@@ -43,6 +46,12 @@ export function Tutor({
   }
   return (
     <div className="question-container">
+      {!enabled && (
+        <p className="notice" role="status">
+          O Professor NEXO ainda está sendo conectado. O envio está desativado;
+          as explicações das questões e as lições continuam disponíveis.
+        </p>
+      )}
       <div className="panel">
         <Sparkles size={26} />
         <h2 style={{ fontSize: 25, margin: "18px 0" }}>Entender muda tudo.</h2>
@@ -62,7 +71,7 @@ export function Tutor({
           "Por que eu errei?",
         ].map((t) => (
           <button
-            disabled={pending}
+            disabled={pending || !enabled}
             className="button secondary small"
             key={t}
             onClick={() => {
@@ -98,6 +107,7 @@ export function Tutor({
         <label>
           Sua dúvida
           <textarea
+            disabled={!enabled}
             maxLength={1500}
             minLength={3}
             required
@@ -106,7 +116,7 @@ export function Tutor({
             placeholder="O que você gostaria de entender melhor?"
           />
         </label>
-        <button disabled={pending} className="button primary">
+        <button disabled={pending || !enabled} className="button primary">
           Enviar pergunta <ArrowUp size={17} />
         </button>
       </form>

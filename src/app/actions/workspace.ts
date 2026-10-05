@@ -174,6 +174,18 @@ export async function reportQuestion(
     return {
       error: "Não foi possível enviar agora. Aguarde e tente novamente.",
     };
+  const { data: report, error: readError } = await db
+    .from("question_reports")
+    .select("detail")
+    .eq("question_id", p.data.question)
+    .single();
+  if (readError)
+    return { error: "Não foi possível confirmar o envio. Tente novamente." };
+  if (report.detail !== p.data.detail)
+    return {
+      success:
+        "Você já enviou um relato para esta questão. O relato anterior foi preservado.",
+    };
   return {
     success:
       "Recebemos seu relato para revisão. Obrigado por ajudar a melhorar o conteúdo.",

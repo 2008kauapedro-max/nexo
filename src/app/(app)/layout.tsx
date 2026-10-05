@@ -5,20 +5,34 @@ import { Navigation } from "@/components/navigation";
 import { logout } from "@/app/actions/auth";
 import { NotificationBell } from "@/components/notification-bell";
 import { ConnectionStatus } from "@/components/connection-status";
+import { Suspense } from "react";
+import { Bell } from "lucide-react";
+function BellPlaceholder() {
+  return (
+    <Link
+      href="/notificacoes"
+      className="notification-bell"
+      aria-label="Notificações"
+    >
+      <Bell size={20} />
+    </Link>
+  );
+}
 export const metadata = { robots: { index: false, follow: false } };
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { db, profile } = await requireProfile();
-  await db.rpc("sync_notifications");
+  const { profile } = await requireProfile();
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-brand">
           <Logo />
-          <NotificationBell />
+          <Suspense fallback={<BellPlaceholder />}>
+            <NotificationBell />
+          </Suspense>
         </div>
         <Navigation />
         <div className="sidebar-footer">
@@ -41,7 +55,9 @@ export default async function AppLayout({
       <header className="mobile-header">
         <Logo />
         <div className="header-actions">
-          <NotificationBell />
+          <Suspense fallback={<BellPlaceholder />}>
+            <NotificationBell />
+          </Suspense>
           <Link href="/perfil" className="avatar" aria-label="Abrir perfil">
             {profile.name.charAt(0).toUpperCase()}
           </Link>

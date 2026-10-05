@@ -119,4 +119,5 @@ Antes do lançamento: habilitar SMTP, definir domínio e identificação/canal d
 
 Plano semanal persistente, missões diárias, desafio curto, reflexão sobre lições, mapa com estimativa de retenção, anotações, flashcards, caderno de erros e notificações fazem parte do mesmo aplicativo. O admin usa abas e páginas próprias para conteúdo, fábrica determinística de rascunhos, qualidade, relatos, custos e saúde. A reflexão é autoavaliação, não correção por IA. Consulte docs/INTERACTION_MAP.md para a cobertura de cada fluxo.
 
-As versões dos nove arquivos de migration foram alinhadas ao histórico atribuído pelo conector remoto, preservando o conteúdo SQL. Não reaplicar migrations com timestamps antigos. Os templates de email estão preparados no Supabase local; isso não valida envio remoto.
+As versões dos arquivos de migration foram alinhadas ao histórico atribuído pelo conector remoto, preservando o conteúdo SQL. Não reaplicar migrations com timestamps antigos. Os templates de email estão preparados no Supabase local; isso não valida envio remoto.
+

@@ -1,14 +1,9 @@
 import Link from "next/link";
 import { Bell } from "lucide-react";
-import { requireUser } from "@/lib/supabase";
+import { unreadNotifications } from "@/lib/notifications";
 import { badgeCount } from "@/domain/notifications";
 export async function NotificationBell() {
-  const { db } = await requireUser();
-  const { count } = await db
-    .from("notifications")
-    .select("id", { count: "exact", head: true })
-    .is("read_at", null)
-    .is("dismissed_at", null);
+  const count = await unreadNotifications();
   return (
     <Link
       className="notification-bell"

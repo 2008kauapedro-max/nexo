@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireProfile } from "@/lib/supabase";
 import { notificationAction } from "@/app/actions/workspace";
 import { notificationGroup } from "@/domain/notifications";
+import { syncNotifications } from "@/lib/notifications";
 export default async function Notifications({
   searchParams,
 }: {
@@ -9,7 +10,7 @@ export default async function Notifications({
 }) {
   const { filtro = "todas" } = await searchParams;
   const { db } = await requireProfile();
-  await db.rpc("sync_notifications");
+  await syncNotifications();
   const { data, error } = await db
     .from("notifications")
     .select("*")

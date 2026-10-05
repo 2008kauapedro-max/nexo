@@ -315,4 +315,101 @@ describe("database permissions with two independent identities", () => {
     ).rejects.toThrow(/PLAN_LIMIT/);
     await db.exec(`delete from public.subscriptions where user_id='${alice}'`);
   });
+  it("resumes owned activity feedback and grades ordering without leaking another user's answers", async () => {
+    const lesson = "40000000-0000-4000-8000-000000000001";
+    const activity = "50000000-0000-4000-8000-000000000099";
+    await db.exec(
+      `insert into public.learning_activities(id,lesson_id,kind,prompt,payload,difficulty,status) values('${activity}','${lesson}','ORDERING','Ordene as etapas','{"items":["fim","inicio"]}',2,'published'); insert into private.activity_keys values('${activity}','{"value":["inicio","fim"]}','Comece pelo inicio e avance até o fim.');`,
+    );
+    const before = (
+      await asUser(
+        alice,
+        `select public.activity_feedback('${lesson}') as feedback`,
+      )
+    ).rows[0] as { feedback: unknown[] };
+    expect(before.feedback).toEqual([]);
+    await asUser(
+      alice,
+      `select public.submit_activity('${activity}','{"value":["inicio","fim"]}','sure')`,
+    );
+    const saved = (
+      await asUser(
+        alice,
+        `select public.activity_feedback('${lesson}') as feedback`,
+      )
+    ).rows[0] as {
+      feedback: { activity_id: string; correct: boolean; response: unknown }[];
+    };
+    expect(saved.feedback).toEqual([
+      expect.objectContaining({
+        activity_id: activity,
+        correct: true,
+        response: { value: ["inicio", "fim"] },
+      }),
+    ]);
+    const others = (
+      await asUser(
+        bob,
+        `select public.activity_feedback('${lesson}') as feedback`,
+      )
+    ).rows[0] as { feedback: { activity_id: string }[] };
+    expect(others.feedback.some((row) => row.activity_id === activity)).toBe(
+      false,
+    );
+  });
+  it("deletes only the caller and cascades private study records", async () => {
+    const disposable = "00000000-0000-4000-8000-000000000099";
+    await db.exec(`insert into auth.users values('${disposable}');`);
+    await asUser(
+      disposable,
+      `insert into public.notes(user_id,title,body) values('${disposable}','Descartável','Teste isolado de exclusão')`,
+    );
+    await asUser(disposable, "select public.delete_account()");
+    expect(
+      (await db.query(`select id from auth.users where id='${disposable}'`))
+        .rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await db.query(
+          `select id from public.notes where user_id='${disposable}'`,
+        )
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (await asUser(disposable, "select id from public.profiles")).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await db.query(
+          `select id from auth.users where id in ('${alice}','${bob}')`,
+        )
+      ).rows,
+    ).toHaveLength(2);
+  });
+  it("restricts billing to the server and makes replay and out-of-order events safe", async () => {
+    const event = `select public.apply_billing_event('qa-event',repeat('a',64),'${bob}','pro','active',now()+interval '1 day',now()) as result`;
+    await expect(asUser(bob, event)).rejects.toThrow(/permission denied/);
+    await db.exec("set role service_role");
+    try {
+      expect((await db.query(event)).rows).toEqual([{ result: "accepted" }]);
+      expect((await db.query(event)).rows).toEqual([{ result: "duplicate" }]);
+      await expect(
+        db.query(event.replace("repeat('a',64)", "repeat('b',64)")),
+      ).rejects.toThrow(/EVENT_COLLISION/);
+      await db.query(
+        `select public.apply_billing_event('qa-old-event',repeat('c',64),'${bob}','free','expired',now()-interval '1 day',now()-interval '2 days')`,
+      );
+    } finally {
+      await db.exec("reset role");
+    }
+    expect(
+      (
+        await db.query(
+          `select plan_id,status from public.subscriptions where user_id='${bob}'`,
+        )
+      ).rows,
+    ).toEqual([{ plan_id: "pro", status: "active" }]);
+    await db.exec(`delete from public.subscriptions where user_id='${bob}'`);
+  });
 });

@@ -12,6 +12,38 @@ async function login(page: Page, index = 1) {
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page).toHaveURL(/inicio$/);
 }
+test("ordering steps are graded and restored after refresh", async ({
+  page,
+}) => {
+  test.skip(!users.length, "Requires isolated QA accounts");
+  await login(page);
+  await page.goto("/aprender");
+  await page.getByRole("link", { name: /Equações: mantenha/ }).click();
+  const activity = page
+    .locator(".activity")
+    .filter({ hasText: "Organize os passos para resolver 2x + 6 = 14." });
+  if (
+    await activity.getByRole("button", { name: "Descer passo 1" }).isEnabled()
+  ) {
+    await activity.getByRole("button", { name: "Descer passo 1" }).click();
+    await activity.getByRole("button", { name: "Descer passo 2" }).click();
+    await activity
+      .getByRole("button", { name: "Verificar meu entendimento" })
+      .click();
+  }
+  await expect(activity.getByRole("status")).toContainText(
+    "Você conectou as ideias",
+  );
+  await page.reload();
+  await expect(activity.getByRole("status")).toContainText(
+    "Você conectou as ideias",
+  );
+  await expect(activity.locator("li span")).toHaveText([
+    "2x + 6 = 14",
+    "2x = 8",
+    "x = 4",
+  ]);
+});
 test("weekly plan and reflection persist after reload", async ({ page }) => {
   test.skip(!users.length, "Requires isolated QA accounts");
   await login(page);

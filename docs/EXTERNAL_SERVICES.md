@@ -18,10 +18,11 @@ Destino exclusivo: projeto Vercel NEXO → Settings → Environment Variables.
 
 Configurar `AI_BASE_URL` (HTTPS do endpoint compatível com Chat Completions, incluindo versão), `AI_MODEL` (identificador real contratado), `AI_API_KEY` (segredo), e `SUPABASE_SECRET_KEY` do NEXO (somente servidor para finalizar consumo). Groq ou outro fornecedor compatível pode ser configurado sem alterar a interface de domínio. Nenhum fornecedor é presumido ou contratado pelo código.
 
-Fallback opcional: `AI_FALLBACK_BASE_URL`, `AI_FALLBACK_MODEL`, `AI_FALLBACK_API_KEY`. Somente provedores completamente configurados são utilizados; a primeira falha encaminha ao segundo. Cada tentativa tem timeout de 18 segundos, limite de saída e validação do formato. Sem chave não há texto simulado: a API retorna indisponibilidade. Mocks existem apenas nos testes unitários.
+Fallback opcional: `AI_FALLBACK_BASE_URL`, `AI_FALLBACK_MODEL`, `AI_FALLBACK_API_KEY`. Somente provedores completamente configurados são utilizados; a primeira falha encaminha ao segundo. Cada tentativa tem timeout de 18 segundos, limite de saída e validação do formato. Sem chave não há texto simulado: a API retorna indisponibilidade e os controles de envio ficam desativados na interface. Mocks existem apenas nos testes unitários.
 
 Após salvar, criar novo deployment. Testar: pergunta contextual, dica sem gabarito, tentativa de prompt injection, recusa educacional, contexto de outro usuário, quota, indisponibilidade, latência, tokens e custo real. A política educacional no prompt não deve ser considerada uma barreira infalível; requer avaliação com o modelo escolhido. Custo monetário não é calculado sem tarifa confirmada. O router atualmente retorna provider/model, mas a persistência de métricas por fornecedor ainda deve ser ampliada.
 
 ## Cobrança
 
 Permanece desativada em produção. Existe contrato de webhook assinado restrito a desenvolvimento, com HMAC, janela de tempo, deduplicação e ordenação de eventos. Isso não equivale a integrar um gateway comercial. Checkout, estornos, conciliação e eventos reais de assinatura precisam de provedor e testes próprios antes da liberação.
+

@@ -28,12 +28,27 @@ export async function GET() {
     exportedAt: new Date().toISOString(),
     email: user.email,
   };
+  const ordering: Record<string, string> = {
+    profiles: "id",
+    user_subjects: "subject_id",
+    topic_mastery: "topic_id",
+    review_queue: "question_id",
+    usage_counters: "day",
+    user_achievements: "achievement_id",
+    subscriptions: "user_id",
+    notification_preferences: "user_id",
+    error_annotations: "question_id",
+    activity_attempts: "activity_id",
+    learning_reflections: "lesson_id",
+    study_plan_items: "day",
+  };
   for (const table of tables) {
     const rows: unknown[] = [];
     for (let offset = 0; ; offset += 500) {
       const { data, error } = await db
         .from(table)
         .select("*")
+        .order(ordering[table] || "id")
         .range(offset, offset + 499);
       if (error)
         return Response.json(
