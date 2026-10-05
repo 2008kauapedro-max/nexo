@@ -1,0 +1,10 @@
+node_modules
+.next
+.local
+package-lock.json
+test-results
+playwright-report
+supabase
+src/lib/database.types.ts
+AGENTS.md
+CLAUDE.md

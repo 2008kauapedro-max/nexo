@@ -1,2 +1,43 @@
-import {requireProfile} from '@/lib/supabase';
-export default async function Plans(){const{db}=await requireProfile();const{data,error}=await db.from('plans').select('*').order('daily_questions');if(error)throw error;return <><div className="page-heading"><div><span className="eyebrow">ESPAÇO PARA CRESCER</span><h1>Um plano para cada passo.</h1><p>Comece de graça. Construa sua rotina de aprendizado.</p></div></div><div className="subject-grid">{data?.map(p=><article className="panel" key={p.id}><span className="pill">{p.id==='free'?'Disponível agora':'Em preparação'}</span><h2 style={{margin:'20px 0'}}>{p.name}</h2><p>{p.daily_questions} questões por dia</p><p>{p.daily_ai} interações IA por dia*</p><p>Simulados de até {p.max_simulation} questões</p><p className="fine-print">{p.id==='free'?'Sem cobrança. Seu aprendizado começa aqui.':'Assinaturas ainda não estão à venda.'}</p></article>)}</div><p className="notice" style={{marginTop:25}}>*O tutor depende da ativação do provedor de IA. Nenhuma cobrança é realizada nesta versão. Preços e checkout serão disponibilizados quando a integração de pagamentos estiver configurada.</p></>;}
+import { requireProfile } from "@/lib/supabase";
+export default async function Plans() {
+  const { db } = await requireProfile();
+  const { data, error } = await db
+    .from("plans")
+    .select("*")
+    .order("daily_questions");
+  if (error) throw error;
+  return (
+    <>
+      <div className="page-heading">
+        <div>
+          <span className="eyebrow">ESPAÇO PARA CRESCER</span>
+          <h1>Um plano para cada passo.</h1>
+          <p>Comece de graça. Construa sua rotina de aprendizado.</p>
+        </div>
+      </div>
+      <div className="subject-grid">
+        {data?.map((p) => (
+          <article className="panel" key={p.id}>
+            <span className="pill">
+              {p.id === "free" ? "Disponível agora" : "Em preparação"}
+            </span>
+            <h2 style={{ margin: "20px 0" }}>{p.name}</h2>
+            <p>{p.daily_questions} questões por dia</p>
+            <p>{p.daily_ai} interações IA por dia*</p>
+            <p>Simulados de até {p.max_simulation} questões</p>
+            <p className="fine-print">
+              {p.id === "free"
+                ? "Sem cobrança. Seu aprendizado começa aqui."
+                : "Assinaturas ainda não estão à venda."}
+            </p>
+          </article>
+        ))}
+      </div>
+      <p className="notice" style={{ marginTop: 25 }}>
+        *O tutor depende da ativação do provedor de IA. Nenhuma cobrança é
+        realizada nesta versão. Preços e checkout serão disponibilizados quando
+        a integração de pagamentos estiver configurada.
+      </p>
+    </>
+  );
+}

@@ -1,2 +1,18 @@
-import {StartForm} from '@/components/start-form';
-export default function Diagnostic(){return <div className="empty-state"><span className="eyebrow">VAMOS ENCONTRAR SEU PONTO DE PARTIDA</span><h1>Sem nota. Sem pressão.<br/>Só o seu próximo passo.</h1><p>Responda até 15 questões. A dificuldade se ajusta às suas respostas para conhecermos melhor seu momento.</p><StartForm mode="diagnostic" target={15} label="Descobrir meu nível"/></div>;}
+import { StartForm } from "@/components/start-form";
+export default function Diagnostic() {
+  return (
+    <div className="empty-state">
+      <span className="eyebrow">VAMOS ENCONTRAR SEU PONTO DE PARTIDA</span>
+      <h1>
+        Sem nota. Sem pressão.
+        <br />
+        Só o seu próximo passo.
+      </h1>
+      <p>
+        Responda até 15 questões. A dificuldade se ajusta às suas respostas para
+        conhecermos melhor seu momento.
+      </p>
+      <StartForm mode="diagnostic" target={15} label="Descobrir meu nível" />
+    </div>
+  );
+}

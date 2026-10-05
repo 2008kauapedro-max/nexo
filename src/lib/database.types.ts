@@ -35,6 +35,48 @@ export type Database = {
         }
         Relationships: []
       }
+      activity_attempts: {
+        Row: {
+          activity_id: string
+          confidence: string
+          correct: boolean
+          created_at: string
+          response: Json
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          confidence: string
+          correct: boolean
+          created_at?: string
+          response: Json
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          confidence?: string
+          correct?: boolean
+          created_at?: string
+          response?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_attempts_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "learning_activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_messages: {
         Row: {
           content: string
@@ -145,6 +187,137 @@ export type Database = {
           },
         ]
       }
+      error_annotations: {
+        Row: {
+          question_id: string
+          reason: string
+          resolved: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          question_id: string
+          reason: string
+          resolved?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          question_id?: string
+          reason?: string
+          resolved?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "error_annotations_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "error_annotations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flashcards: {
+        Row: {
+          back: string
+          created_at: string
+          front: string
+          id: string
+          interval_days: number
+          last_reviewed: string | null
+          next_review: string
+          topic_id: string | null
+          user_id: string
+        }
+        Insert: {
+          back: string
+          created_at?: string
+          front: string
+          id?: string
+          interval_days?: number
+          last_reviewed?: string | null
+          next_review?: string
+          topic_id?: string | null
+          user_id?: string
+        }
+        Update: {
+          back?: string
+          created_at?: string
+          front?: string
+          id?: string
+          interval_days?: number
+          last_reviewed?: string | null
+          next_review?: string
+          topic_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flashcards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_activities: {
+        Row: {
+          difficulty: number
+          id: string
+          kind: string
+          lesson_id: string
+          payload: Json
+          position: number
+          prompt: string
+          status: string
+        }
+        Insert: {
+          difficulty: number
+          id?: string
+          kind: string
+          lesson_id: string
+          payload?: Json
+          position?: number
+          prompt: string
+          status?: string
+        }
+        Update: {
+          difficulty?: number
+          id?: string
+          kind?: string
+          lesson_id?: string
+          payload?: Json
+          position?: number
+          prompt?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_activities_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       learning_sessions: {
         Row: {
           answered: number
@@ -156,6 +329,7 @@ export type Database = {
           id: string
           mode: string
           question_served_at: string | null
+          review_source: string | null
           started_at: string
           subject_id: string | null
           target: number
@@ -172,6 +346,7 @@ export type Database = {
           id?: string
           mode: string
           question_served_at?: string | null
+          review_source?: string | null
           started_at?: string
           subject_id?: string | null
           target: number
@@ -188,6 +363,7 @@ export type Database = {
           id?: string
           mode?: string
           question_served_at?: string | null
+          review_source?: string | null
           started_at?: string
           subject_id?: string | null
           target?: number
@@ -200,6 +376,13 @@ export type Database = {
             columns: ["current_question_id"]
             isOneToOne: false
             referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_sessions_review_source_fkey"
+            columns: ["review_source"]
+            isOneToOne: false
+            referencedRelation: "learning_sessions"
             referencedColumns: ["id"]
           },
           {
@@ -218,6 +401,165 @@ export type Database = {
           },
           {
             foreignKeyName: "learning_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          example: string
+          explanation: string
+          id: string
+          status: string
+          title: string
+          topic_id: string
+        }
+        Insert: {
+          example: string
+          explanation: string
+          id?: string
+          status?: string
+          title: string
+          topic_id: string
+        }
+        Update: {
+          example?: string
+          explanation?: string
+          id?: string
+          status?: string
+          title?: string
+          topic_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          title: string
+          topic_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          title: string
+          topic_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+          topic_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          achievements: boolean
+          news: boolean
+          study: boolean
+          user_id: string
+        }
+        Insert: {
+          achievements?: boolean
+          news?: boolean
+          study?: boolean
+          user_id: string
+        }
+        Update: {
+          achievements?: boolean
+          news?: boolean
+          study?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          dedupe_key: string
+          dismissed_at: string | null
+          href: string
+          id: string
+          kind: string
+          priority: string
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          dedupe_key: string
+          dismissed_at?: string | null
+          href: string
+          id?: string
+          kind: string
+          priority?: string
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          dedupe_key?: string
+          dismissed_at?: string | null
+          href?: string
+          id?: string
+          kind?: string
+          priority?: string
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -342,6 +684,51 @@ export type Database = {
           },
           {
             foreignKeyName: "question_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_reports: {
+        Row: {
+          created_at: string
+          detail: string
+          id: string
+          question_id: string
+          reason: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string
+          id?: string
+          question_id: string
+          reason: string
+          status?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string
+          id?: string
+          question_id?: string
+          reason?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_reports_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_reports_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -493,6 +880,7 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          last_event_at: string
           period_end: string
           plan_id: string
           provider_reference: string | null
@@ -501,6 +889,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          last_event_at?: string
           period_end: string
           plan_id: string
           provider_reference?: string | null
@@ -509,6 +898,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          last_event_at?: string
           period_end?: string
           plan_id?: string
           provider_reference?: string | null
@@ -597,6 +987,36 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      topic_prerequisites: {
+        Row: {
+          prerequisite_id: string
+          topic_id: string
+        }
+        Insert: {
+          prerequisite_id: string
+          topic_id: string
+        }
+        Update: {
+          prerequisite_id?: string
+          topic_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topic_prerequisites_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "topic_prerequisites_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
             referencedColumns: ["id"]
           },
         ]
@@ -733,7 +1153,24 @@ export type Database = {
         }
         Returns: string
       }
+      admin_finance: { Args: never; Returns: Json }
+      admin_health: { Args: never; Returns: Json }
       admin_questions: { Args: never; Returns: Json }
+      admin_record_cost: {
+        Args: {
+          p_amount: number
+          p_category: string
+          p_currency: string
+          p_period: string
+        }
+        Returns: string
+      }
+      admin_reports: { Args: never; Returns: Json }
+      admin_resolve_report: {
+        Args: { p_id: string; p_status: string }
+        Returns: undefined
+      }
+      admin_role: { Args: never; Returns: string }
       admin_upsert_question: {
         Args: { p_id?: string; p_question: Json }
         Returns: string
@@ -741,6 +1178,18 @@ export type Database = {
       ai_context: {
         Args: { p_question: string; p_session: string }
         Returns: Json
+      }
+      apply_billing_event: {
+        Args: {
+          p_created_at: string
+          p_hash: string
+          p_id: string
+          p_period_end: string
+          p_plan: string
+          p_status: string
+          p_user: string
+        }
+        Returns: string
       }
       delete_account: { Args: never; Returns: undefined }
       finish_ai: {
@@ -757,7 +1206,16 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       next_question: { Args: { p_session: string }; Returns: Json }
+      report_question: {
+        Args: { p_detail: string; p_question: string; p_reason: string }
+        Returns: undefined
+      }
       reserve_ai: { Args: never; Returns: string }
+      review_flashcard: {
+        Args: { p_id: string; p_remembered: boolean }
+        Returns: undefined
+      }
+      review_session: { Args: { p_source: string }; Returns: string }
       save_preferences: {
         Args: {
           p_daily_goal: number
@@ -779,10 +1237,15 @@ export type Database = {
         }
         Returns: string
       }
+      submit_activity: {
+        Args: { p_activity: string; p_confidence: string; p_response: Json }
+        Returns: Json
+      }
       submit_answer: {
         Args: { p_question: string; p_selected: number; p_session: string }
         Returns: Json
       }
+      sync_notifications: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

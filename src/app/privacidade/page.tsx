@@ -1,2 +1,49 @@
-import {Logo} from '@/components/logo';
-export default function Privacy(){return <><header className="public-header wrap"><Logo/></header><main id="main" className="wrap" style={{maxWidth:740,paddingBottom:60}}><span className="eyebrow">TRANSPARÊNCIA</span><h1 style={{margin:'24px 0'}}>Seu aprendizado. Seus dados.</h1><div className="form-stack"><p>O NEXO armazena seu e-mail, preferências, respostas, tempo de estudo e progresso para autenticar sua conta e adaptar seus estudos. O banco utiliza Supabase em São Paulo.</p><h2>Controle sobre suas informações</h2><p>Você pode editar suas preferências e baixar seus dados no Perfil. A exclusão de conta removerá seus registros pessoais e de estudo; registros de cobrança poderão exigir retenção conforme obrigações aplicáveis.</p><h2>Tutor e serviços externos</h2><p>Quando ativado, o tutor envia ao provedor de IA apenas o contexto necessário da questão e sua mensagem. Não envie documentos pessoais, senhas ou informações sensíveis.</p><h2>Cookies e segurança</h2><p>Usamos cookies necessários à sessão. Não usamos publicidade comportamental nem vendemos dados pessoais. Dados de autenticação e estudos não são armazenados no cache offline.</p><p className="notice">Este produto está em implantação. A identificação do controlador, canal de privacidade, condições para menores e política de retenção devem ser definidos antes do lançamento público.</p></div></main></>;}
+import { Logo } from "@/components/logo";
+export default function Privacy() {
+  return (
+    <>
+      <header className="public-header wrap">
+        <Logo />
+      </header>
+      <main
+        id="main"
+        className="wrap"
+        style={{ maxWidth: 740, paddingBottom: 60 }}
+      >
+        <span className="eyebrow">TRANSPARÊNCIA</span>
+        <h1 style={{ margin: "24px 0" }}>Seu aprendizado. Seus dados.</h1>
+        <div className="form-stack">
+          <p>
+            O NEXO armazena seu e-mail, preferências, respostas, tempo de estudo
+            e progresso para autenticar sua conta e adaptar seus estudos. O
+            banco utiliza Supabase em São Paulo.
+          </p>
+          <h2>Controle sobre suas informações</h2>
+          <p>
+            Você pode editar suas preferências e baixar seus dados no Perfil. A
+            exclusão de conta removerá seus registros pessoais e de estudo;
+            registros de cobrança poderão exigir retenção conforme obrigações
+            aplicáveis.
+          </p>
+          <h2>Tutor e serviços externos</h2>
+          <p>
+            Quando ativado, o tutor envia ao provedor de IA apenas o contexto
+            necessário da questão e sua mensagem. Não envie documentos pessoais,
+            senhas ou informações sensíveis.
+          </p>
+          <h2>Cookies e segurança</h2>
+          <p>
+            Usamos cookies necessários à sessão. Não usamos publicidade
+            comportamental nem vendemos dados pessoais. Dados de autenticação e
+            estudos não são armazenados no cache offline.
+          </p>
+          <p className="notice">
+            Este produto está em implantação. A identificação do controlador,
+            canal de privacidade, condições para menores e política de retenção
+            devem ser definidos antes do lançamento público.
+          </p>
+        </div>
+      </main>
+    </>
+  );
+}
