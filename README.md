@@ -56,7 +56,7 @@ npx supabase link --project-ref SEU_PROJECT_REF_NEXO
 npx supabase db push
 ```
 
-O seed está em `supabase/seed.sql`; ele é idempotente por fingerprint. `node scripts/seed.mjs` regenera as 42 questões autorais. Não substitui revisão pedagógica por especialistas. Migrations foram geradas pela CLI e aplicadas na ordem; nunca altere uma migration já aplicada, acrescente outra.
+Os seeds estão em `supabase/seed.sql` e `supabase/lessons-seed.sql`; ele é idempotente por fingerprint. `node scripts/seed.mjs` regenera as 42 questões autorais. Não substitui revisão pedagógica por especialistas. Migrations foram geradas pela CLI e aplicadas na ordem; nunca altere uma migration já aplicada, acrescente outra.
 
 Gere os tipos após mudanças no schema usando `supabase gen types typescript`, apontando explicitamente para o projeto NEXO. O arquivo utilizado pelo aplicativo é `src/lib/database.types.ts`.
 
@@ -104,7 +104,7 @@ npm run build
 npm run start
 ```
 
-Na Vercel, importe apenas `2008kauapedro-max/nexo`, selecione Next.js e configure as variáveis. Use uma implantação de preview, valide Auth/callbacks e só então promova para produção. A tentativa de criação via conexão Vercel desta sessão foi bloqueada por permissão 403.
+Na Vercel, importe apenas `2008kauapedro-max/nexo`, selecione Next.js e configure as variáveis. Use uma implantação de preview, valide Auth/callbacks e só então promova para produção. O projeto NEXO já está publicado em https://nexo-six-beta.vercel.app, conectado ao repositório oficial. Consulte docs/VALIDATION.md para o deployment e os resultados efetivamente auditados.
 
 Antes do lançamento: habilitar SMTP, definir domínio e identificação/canal do controlador de dados, revisar condições para menores, revisão pedagógica, habilitar monitoramento e configurar IA/pagamentos conforme contratação. Não declarar a versão como comercialmente pronta até essas etapas.
 
@@ -114,3 +114,9 @@ Antes do lançamento: habilitar SMTP, definir domínio e identificação/canal d
 - [Segurança e modelo de ameaças](docs/SECURITY.md)
 - [Importação de conteúdo](docs/IMPORT.md)
 - [Validação e pendências](docs/VALIDATION.md)
+
+## Expansão do aprendizado
+
+Plano semanal persistente, missões diárias, desafio curto, reflexão sobre lições, mapa com estimativa de retenção, anotações, flashcards, caderno de erros e notificações fazem parte do mesmo aplicativo. O admin usa abas e páginas próprias para conteúdo, fábrica determinística de rascunhos, qualidade, relatos, custos e saúde. A reflexão é autoavaliação, não correção por IA. Consulte docs/INTERACTION_MAP.md para a cobertura de cada fluxo.
+
+As versões dos nove arquivos de migration foram alinhadas ao histórico atribuído pelo conector remoto, preservando o conteúdo SQL. Não reaplicar migrations com timestamps antigos. Os templates de email estão preparados no Supabase local; isso não valida envio remoto.

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/supabase";
+import { retentionEstimate } from "@/domain/retention";
 export default async function Knowledge({
   searchParams,
 }: {
@@ -54,6 +55,19 @@ export default async function Knowledge({
                       ? `${m.attempts} evidências de aprendizagem. Domínio é uma estimativa, não uma nota.`
                       : "Comece uma atividade para conhecer seu ponto de partida."}
                   </p>
+                  {m &&
+                    retentionEstimate(
+                      m.score,
+                      m.updated_at,
+                      new Date(),
+                      m.attempts,
+                    ) <
+                      m.score * 0.8 && (
+                      <p className="notice">
+                        Este assunto está há algum tempo sem prática. Uma
+                        revisão curta pode ajudar a consolidar a memória.
+                      </p>
+                    )}
                   {lessons
                     ?.filter((l) => l.topic_id === t.id)
                     .map((l) => (

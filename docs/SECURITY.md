@@ -23,7 +23,7 @@ Ativos: identidade, histórico educacional, gabaritos, papéis administrativos, 
 
 ## Privilégios
 
-Todas as 18 tabelas públicas têm RLS e SELECT concedido explicitamente ao papel autenticado. As policies globais de leitura limitam-se aos catálogos compartilhados; dados pessoais sempre usam propriedade. Questões só podem ser lidas se publicadas. As quatro tabelas privadas não concedem acesso a clientes e têm policies restritivas de negação.
+Todas as 30 tabelas públicas têm RLS e SELECT concedido explicitamente ao papel autenticado. As policies globais de leitura limitam-se aos catálogos compartilhados; dados pessoais sempre usam propriedade. Questões só podem ser lidas se publicadas. As seis tabelas privadas não concedem acesso a clientes e têm policies restritivas de negação.
 
 Funções SECURITY DEFINER são usadas intencionalmente como operações transacionais estreitas, com `search_path=''`, verificação de identidade e de ownership/admin. EXECUTE foi revogado de PUBLIC e anon. O advisor alerta sobre essas funções expostas a authenticated; é uma superfície de API deliberada, não uma alegação de ausência de avisos. Cada nova função deve passar pelos mesmos testes. Funções de finalização IA e billing são exclusivas de `service_role`.
 
@@ -43,3 +43,9 @@ Advisors de segurança e performance foram executados. Os índices compostos fal
 - Nunca registrar tokens, senhas ou payloads completos do tutor. Logs administrativos contêm ator, ação, entidade e timestamp.
 
 Referências dos advisors: [SECURITY DEFINER](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable), [índices de FKs](https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys).
+
+## Auditoria complementar de 04/10/2026
+
+Histórico remoto e arquivos locais: nove migrations. Consulta aos catálogos confirmou RLS nas 30 tabelas públicas e nas seis privadas. Nenhuma função pública SECURITY DEFINER acessível a anon ou sem configuração explícita de search_path foi encontrada. Advisors: 25 avisos de RPCs autenticadas SECURITY DEFINER e um de senha vazada dependente de Pro; performance: 25 índices ainda sem uso, nível INFO. Sem upgrade ou alteração de custos.
+
+Testes adicionais exercitam FINANCE_ADMIN sem conteúdo/saúde, isolamento de notas/cartões/reflexões/plano, plano Premium válido versus expirado e roles forjadas em claims. Instrumentação registra rota, método, categoria e digest, sem cookies, cabeçalhos ou texto do aluno. O hook padrão do framework pode registrar o erro original: não lançar segredos como mensagem de erro.

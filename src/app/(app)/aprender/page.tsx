@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/supabase";
 import { ArrowUpRight } from "lucide-react";
-export default async function Learn() {
+export default async function Learn({
+  searchParams,
+}: {
+  searchParams: Promise<{ assunto?: string }>;
+}) {
+  const { assunto } = await searchParams;
   const { db } = await requireProfile();
   const { data, error } = await db
     .from("lessons")
@@ -18,16 +23,18 @@ export default async function Learn() {
         </div>
       </div>
       <div className="lesson-list">
-        {data.map((l) => (
-          <Link className="row-card" key={l.id} href={`/aprender/${l.id}`}>
-            <div>
-              <span className="eyebrow">{l.topics?.subjects?.name}</span>
-              <h2>{l.title}</h2>
-              <p>Explicação + exemplo + atividades</p>
-            </div>
-            <ArrowUpRight size={20} />
-          </Link>
-        ))}
+        {data
+          .filter((l) => !assunto || l.topic_id === assunto)
+          .map((l) => (
+            <Link className="row-card" key={l.id} href={`/aprender/${l.id}`}>
+              <div>
+                <span className="eyebrow">{l.topics?.subjects?.name}</span>
+                <h2>{l.title}</h2>
+                <p>Explicação + exemplo + atividades</p>
+              </div>
+              <ArrowUpRight size={20} />
+            </Link>
+          ))}
       </div>
     </>
   );

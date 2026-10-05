@@ -54,10 +54,13 @@ export async function removeArtifact(form: FormData) {
   if (!z.uuid().safeParse(id).success) return;
   const kind = form.get("kind");
   const { db, user } = await requireUser();
-  if (kind === "note")
-    await db.from("notes").delete().eq("id", id).eq("user_id", user.id);
-  if (kind === "flashcard")
-    await db.from("flashcards").delete().eq("id", id).eq("user_id", user.id);
+  if (kind !== "note" && kind !== "flashcard") return;
+  const { error } = await db
+    .from(kind === "note" ? "notes" : "flashcards")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw new Error("Não foi possível excluir. Tente novamente.");
   revalidatePath(kind === "note" ? "/anotacoes" : "/flashcards");
 }
 export async function reviewCard(id: string, remembered: boolean) {

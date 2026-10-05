@@ -250,4 +250,69 @@ describe("database permissions with two independent identities", () => {
       (await asUser(bob, "select * from public.question_attempts")).rows,
     ).toHaveLength(0);
   });
+  it("generates an idempotent private study plan and stores reflections without granting XP", async () => {
+    await asUser(alice, "select public.generate_study_plan()");
+    await asUser(alice, "select public.generate_study_plan()");
+    expect(
+      (await asUser(alice, "select * from public.study_plan_items")).rows,
+    ).toHaveLength(7);
+    expect(
+      (await asUser(bob, "select * from public.study_plan_items")).rows,
+    ).toHaveLength(0);
+    const lesson = "40000000-0000-4000-8000-000000000001";
+    await asUser(
+      alice,
+      `insert into public.learning_reflections(user_id,lesson_id,explanation) values('${alice}','${lesson}','Somar significa reunir quantidades em um total.')`,
+    );
+    expect(
+      (await asUser(bob, "select * from public.learning_reflections")).rows,
+    ).toHaveLength(0);
+    await expect(
+      asUser(
+        bob,
+        `insert into public.learning_reflections(user_id,lesson_id,explanation) values('${alice}','${lesson}','Uma tentativa de escrever na conta de outra pessoa.')`,
+      ),
+    ).rejects.toThrow(/row-level security/);
+    expect(
+      (await asUser(alice, "select xp from public.profiles")).rows,
+    ).toEqual([{ xp: 20 }]);
+    await expect(
+      asUser(alice, "select public.admin_quality()"),
+    ).rejects.toThrow(/FORBIDDEN/);
+  });
+  it("honors paid limits only for current subscriptions and ignores forged JWT roles", async () => {
+    await db.exec(
+      `select set_config('request.jwt.claims','{"role":"SUPER_ADMIN","user_metadata":{"role":"SUPER_ADMIN","plan":"premium"}}',false)`,
+    );
+    expect(
+      (await asUser(alice, "select public.is_admin() as allowed")).rows,
+    ).toEqual([{ allowed: false }]);
+    await expect(
+      asUser(
+        alice,
+        "select public.start_session('simulation',null,null,180,30)",
+      ),
+    ).rejects.toThrow(/PLAN_LIMIT/);
+    await db.exec(
+      `insert into public.subscriptions(user_id,plan_id,status,period_end) values('${alice}','premium','active',now()+interval '1 day')`,
+    );
+    expect(
+      (
+        await asUser(
+          alice,
+          "select public.start_session('simulation',null,null,180,30)",
+        )
+      ).rows,
+    ).toHaveLength(1);
+    await db.exec(
+      `update public.subscriptions set period_end=now()-interval '1 day' where user_id='${alice}'`,
+    );
+    await expect(
+      asUser(
+        alice,
+        "select public.start_session('simulation',null,null,180,30)",
+      ),
+    ).rejects.toThrow(/PLAN_LIMIT/);
+    await db.exec(`delete from public.subscriptions where user_id='${alice}'`);
+  });
 });

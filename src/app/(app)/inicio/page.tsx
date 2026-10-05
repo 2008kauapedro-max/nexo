@@ -44,7 +44,9 @@ export default async function Home() {
           </span>
           <strong>
             {profile.streak}{" "}
-            <small style={{ fontSize: 12, letterSpacing: 0 }}>dias</small>
+            <small style={{ fontSize: 12, letterSpacing: 0 }}>
+              {profile.streak === 1 ? "dia" : "dias"}
+            </small>
           </strong>
         </div>
         <div className="stat">
@@ -99,6 +101,10 @@ export default async function Home() {
         <Link href="/estudar">
           Explorar <span>Escolher uma matéria ↗</span>
         </Link>
+      </nav>
+      <nav className="workspace-links" aria-label="Organizar estudos">
+        <Link href="/plano">Minha semana</Link>
+        <Link href="/missoes">Missões de hoje</Link>
       </nav>
     </>
   );

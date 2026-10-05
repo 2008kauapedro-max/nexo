@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       parsed.data.prompt,
       context,
     );
-    await service.rpc("finish_ai", {
+    const { error: saveError } = await service.rpc("finish_ai", {
       p_usage: usage,
       p_user: user.id,
       p_question: parsed.data.question!,
@@ -91,9 +91,11 @@ export async function POST(request: Request) {
       p_tokens: result.tokens,
       p_success: true,
     });
+    if (saveError)
+      console.error("nexo_ai_persistence_failed", { code: saveError.code });
     return Response.json({ text: result.text });
   } catch {
-    await service.rpc("finish_ai", {
+    const { error: refundError } = await service.rpc("finish_ai", {
       p_usage: usage,
       p_user: user.id,
       p_question: parsed.data.question!,
@@ -102,10 +104,13 @@ export async function POST(request: Request) {
       p_tokens: 0,
       p_success: false,
     });
+    if (refundError)
+      console.error("nexo_ai_refund_failed", { code: refundError.code });
     return Response.json(
       {
-        error:
-          "O tutor não respondeu a tempo. Sua interação foi devolvida; tente novamente.",
+        error: refundError
+          ? "O tutor está indisponível. Não foi possível confirmar a devolução da interação; tente mais tarde."
+          : "O tutor não respondeu a tempo. Sua interação foi devolvida; tente novamente.",
       },
       { status: 503 },
     );

@@ -10,6 +10,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
     trace: "retain-on-failure",
+    reducedMotion: "reduce",
     screenshot: "only-on-failure",
   },
   webServer: process.env.E2E_BASE_URL

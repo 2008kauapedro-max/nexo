@@ -41,6 +41,9 @@ export default async function Study() {
         <h2>Seu espaço de estudo</h2>
       </div>
       <div className="workspace-links">
+        <Link href="/plano">Plano de estudos →</Link>
+        <Link href="/missoes">Missões →</Link>
+        <Link href="/desafios">Desafios →</Link>
         <Link href="/mapa">Mapa de conhecimento →</Link>
         <Link href="/flashcards">Flashcards →</Link>
         <Link href="/anotacoes">Anotações →</Link>

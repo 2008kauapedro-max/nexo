@@ -33,15 +33,41 @@ export function Admin({
   const [catalog, catalogAction, saving] = useActionState(saveCatalog, {});
   const [editing, setEditing] = useState<Row | null>(null);
   const [search, setSearch] = useState("");
+  const [section, setSection] = useState("questions");
+  const [page, setPage] = useState(0);
+  const filtered = questions.filter((q) =>
+    q.statement.toLowerCase().includes(search.toLowerCase()),
+  );
   return (
     <div className="form-stack">
-      <section className="panel">
+      <nav className="tabs" aria-label="Ferramentas de conteúdo">
+        {[
+          ["questions", "Questões"],
+          ["edit", "Criar questão"],
+          ["import", "Importar"],
+          ["catalog", "Catálogo"],
+        ].map(([id, label]) => (
+          <button
+            type="button"
+            className={`button small ${section === id ? "primary" : "secondary"}`}
+            key={id}
+            onClick={() => setSection(id)}
+            aria-pressed={section === id}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+      <section className="panel" hidden={section !== "questions"}>
         <h2 style={{ marginBottom: 20 }}>Banco de questões</h2>
         <label>
           Pesquisar
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
             placeholder="Buscar no enunciado"
           />
         </label>
@@ -55,29 +81,47 @@ export function Admin({
               </tr>
             </thead>
             <tbody>
-              {questions
-                .filter((q) =>
-                  q.statement.toLowerCase().includes(search.toLowerCase()),
-                )
-                .map((q) => (
-                  <tr key={q.id}>
-                    <td>{q.statement.slice(0, 90)}</td>
-                    <td>{q.status}</td>
-                    <td>
-                      <button
-                        className="button small secondary"
-                        onClick={() => setEditing(q)}
-                      >
-                        Editar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+              {filtered.slice(page * 10, (page + 1) * 10).map((q) => (
+                <tr key={q.id}>
+                  <td>{q.statement.slice(0, 90)}</td>
+                  <td>{q.status}</td>
+                  <td>
+                    <button
+                      className="button small secondary"
+                      onClick={() => {
+                        setEditing(q);
+                        setSection("edit");
+                      }}
+                    >
+                      Editar
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
+        <div className="toolbar">
+          <button
+            className="button small secondary"
+            disabled={page === 0}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            Anterior
+          </button>
+          <span>
+            Página {page + 1} de {Math.max(1, Math.ceil(filtered.length / 10))}
+          </span>
+          <button
+            className="button small secondary"
+            disabled={(page + 1) * 10 >= filtered.length}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Próxima
+          </button>
+        </div>
       </section>
-      <section className="panel">
+      <section className="panel" hidden={section !== "edit"}>
         <h2 style={{ marginBottom: 20 }}>
           {editing ? "Editar questão" : "Nova questão"}
         </h2>
@@ -183,7 +227,7 @@ export function Admin({
           )}
         </form>
       </section>
-      <section className="panel">
+      <section className="panel" hidden={section !== "import"}>
         <h2 style={{ marginBottom: 20 }}>Importar JSON ou CSV</h2>
         <p style={{ marginBottom: 20 }}>
           Até 100 questões por lote. Use os campos do modelo em docs/IMPORT.md.
@@ -214,7 +258,7 @@ export function Admin({
           </button>
         </form>
       </section>
-      <section className="panel">
+      <section className="panel" hidden={section !== "catalog"}>
         <h2 style={{ marginBottom: 20 }}>Ampliar o catálogo</h2>
         <form action={catalogAction} className="form-stack">
           <label>

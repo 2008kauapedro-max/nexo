@@ -48,6 +48,8 @@ export default async function AdminPage() {
       )}
       <nav className="workspace-links">
         <Link href="/admin/relatos">Relatos dos alunos</Link>
+        <Link href="/admin/fabrica">Fábrica de questões</Link>
+        <Link href="/admin/qualidade">Qualidade</Link>
       </nav>
       <Admin
         subjects={subjects || []}

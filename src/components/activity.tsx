@@ -25,13 +25,20 @@ export function Activity({
         onSubmit={(e) => {
           e.preventDefault();
           start(async () => {
-            const r = await submitActivity(
-              activity.id,
-              activity.kind === "TRUE_FALSE" ? value === "true" : value,
-              confidence,
-            );
-            if (r.error) setError(r.error);
-            else if (r.data) setFeedback(r.data);
+            setError("");
+            try {
+              const r = await submitActivity(
+                activity.id,
+                activity.kind === "TRUE_FALSE" ? value === "true" : value,
+                confidence,
+              );
+              if (r.error) setError(r.error);
+              else if (r.data) setFeedback(r.data);
+            } catch {
+              setError(
+                "A conexão falhou. Sua resposta continua aqui; tente novamente.",
+              );
+            }
           });
         }}
       >

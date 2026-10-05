@@ -37,12 +37,19 @@ export function Question({
   function submit() {
     if (selected === null) return;
     startTransition(async () => {
-      const result = await answerQuestion(sessionId, question.id, selected);
-      if (result.error) setError(result.error);
-      else if (result.data) {
-        setFeedback(result.data);
-        if (result.data.correct && "vibrate" in navigator)
-          navigator.vibrate(20);
+      setError("");
+      try {
+        const result = await answerQuestion(sessionId, question.id, selected);
+        if (result.error) setError(result.error);
+        else if (result.data) {
+          setFeedback(result.data);
+          if (result.data.correct && "vibrate" in navigator)
+            navigator.vibrate(20);
+        }
+      } catch {
+        setError(
+          "A conexão falhou. Sua seleção foi mantida. Tente enviar novamente quando a conexão voltar.",
+        );
       }
     });
   }

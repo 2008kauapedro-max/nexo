@@ -21,6 +21,8 @@ export async function GET() {
     "error_annotations",
     "question_reports",
     "activity_attempts",
+    "study_plan_items",
+    "learning_reflections",
   ] as const;
   const result: Record<string, unknown> = {
     exportedAt: new Date().toISOString(),

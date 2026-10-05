@@ -12,9 +12,14 @@ export function Flashcard({
   const [pending, start] = useTransition();
   function answer(remembered: boolean) {
     start(async () => {
-      const r = await reviewCard(card.id, remembered);
-      if (r.error) setError(r.error);
-      else setDone(true);
+      setError("");
+      try {
+        const r = await reviewCard(card.id, remembered);
+        if (r.error) setError(r.error);
+        else setDone(true);
+      } catch {
+        setError("A conexão falhou. Tente registrar novamente quando voltar.");
+      }
     });
   }
   return (

@@ -318,6 +318,42 @@ export type Database = {
           },
         ]
       }
+      learning_reflections: {
+        Row: {
+          explanation: string
+          lesson_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          explanation: string
+          lesson_id: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          explanation?: string
+          lesson_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_reflections_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_reflections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       learning_sessions: {
         Row: {
           answered: number
@@ -857,6 +893,48 @@ export type Database = {
           },
         ]
       }
+      study_plan_items: {
+        Row: {
+          created_at: string
+          day: string
+          kind: string
+          target: number
+          topic_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          kind: string
+          target: number
+          topic_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          kind?: string
+          target?: number
+          topic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_plan_items_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_plan_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subjects: {
         Row: {
           id: string
@@ -1155,6 +1233,7 @@ export type Database = {
       }
       admin_finance: { Args: never; Returns: Json }
       admin_health: { Args: never; Returns: Json }
+      admin_quality: { Args: never; Returns: Json }
       admin_questions: { Args: never; Returns: Json }
       admin_record_cost: {
         Args: {
@@ -1204,6 +1283,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      generate_study_plan: { Args: never; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       next_question: { Args: { p_session: string }; Returns: Json }
       report_question: {

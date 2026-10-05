@@ -45,6 +45,9 @@ export default async function Lesson({
         <Activity activity={a} key={a.id} />
       ))}
       <section className="lesson-next">
+        <Link className="button secondary" href={`/provar/${id}`}>
+          Me prove que aprendeu →
+        </Link>
         <h2>Agora, mude o contexto.</h2>
         <p>
           Pratique com outras questões para descobrir se o conceito ficou claro.

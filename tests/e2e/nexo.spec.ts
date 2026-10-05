@@ -113,6 +113,7 @@ for (const [width, height] of sizes)
     }
     await page.goto("/");
     await page.screenshot({
+      caret: "initial",
       path: `test-results/landing-${width}.png`,
       fullPage: true,
     });
@@ -137,6 +138,7 @@ for (const [width, height] of sizes)
         ).toBe(true);
         if ([390, 768, 1440].includes(width))
           await page.screenshot({
+            caret: "initial",
             path:
               "test-results/screen-" +
               route.replaceAll("/", "-") +
@@ -149,6 +151,7 @@ for (const [width, height] of sizes)
       await page.goto("/inicio");
       await expect(page.locator("h1")).toBeVisible();
       await page.screenshot({
+        caret: "initial",
         path: `test-results/home-${width}.png`,
         fullPage: true,
       });
@@ -180,6 +183,7 @@ test("real study flow, feedback, result, AI unavailable, export and logout", asy
     page.getByRole("heading", { name: "Você avançou." }),
   ).toBeVisible();
   await page.screenshot({
+    caret: "initial",
     path: "test-results/result-mobile.png",
     fullPage: true,
   });
@@ -221,6 +225,7 @@ test("simulation limit, ordinary user admin denial and actual admin access", asy
   await expect(
     page.getByRole("heading", { name: "Qualidade começa no conteúdo." }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Importar", exact: true }).click();
   await page.getByLabel("Lista de questões").fill("[{}]");
   await page.getByRole("button", { name: "Validar e importar" }).click();
   await expect(page.locator("main [role=alert]")).toContainText("Linha 1");
