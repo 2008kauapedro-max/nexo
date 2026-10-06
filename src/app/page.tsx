@@ -9,16 +9,20 @@ import {
   MoveUpRight,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { brand } from "@/config/brand";
+import { useTranslations } from "next-intl";
+import { LanguageSelector } from "@/components/language-selector";
 export default function Landing() {
+  const t = useTranslations("landing");
+  const auth = useTranslations("auth");
   return (
     <div className="landing">
       <header className="public-header wrap">
         <Logo />
-        <nav aria-label="Navegação pública">
-          <Link href="/entrar">Entrar</Link>
+        <nav aria-label={t("publicNavigation")}>
+          <LanguageSelector compact />
+          <Link href="/entrar">{auth("login")}</Link>
           <Link href="/cadastro" className="button small dark">
-            Começar <ArrowUpRight size={16} />
+            {t("start")} <ArrowUpRight size={16} />
           </Link>
         </nav>
       </header>
@@ -26,34 +30,25 @@ export default function Landing() {
         <section className="hero wrap">
           <div className="hero-copy">
             <span className="eyebrow">
-              <span className="live-dot" /> SEU PRÓXIMO NÍVEL COMEÇA AQUI
+              <span className="live-dot" /> {t("eyebrow")}
             </span>
             <h1>
-              Seu ritmo.
+              {t("pace")}
               <br />
-              Seu caminho.
+              {t("path")}
               <br />
-              <span>Seu próximo nível.</span>
+              <span>{t("level")}</span>
             </h1>
-            <p>
-              Você não precisa estudar tudo de novo.
-              <br className="desktop-break" /> Precisa descobrir o que vem a
-              seguir.
-            </p>
+            <p>{t("description")}</p>
             <Link className="button primary" href="/cadastro">
-              Começar gratuitamente <ArrowRight size={19} />
+              {t("startFree")} <ArrowRight size={19} />
             </Link>
-            <div className="hero-note">
-              Sem cartão de crédito. Um passo de cada vez.
-            </div>
+            <div className="hero-note">{t("noCard")}</div>
           </div>
-          <div
-            className="hero-art"
-            aria-label="Ilustração do caminho de aprendizado"
-          >
+          <div className="hero-art" aria-label={t("illustration")}>
             <div className="orbit orbit-one" />
             <div className="orbit orbit-two" />
-            <span className="art-label">CONHECIMENTO EM MOVIMENTO</span>
+            <span className="art-label">{t("motion")}</span>
             <div className="art-core">
               <span>n</span>
               <i />
@@ -63,8 +58,8 @@ export default function Landing() {
                 <Focus size={20} />
               </span>
               <div>
-                <b>O desafio certo.</b>
-                <small>Na hora certa para você.</small>
+                <b>{t("challenge")}</b>
+                <small>{t("timing")}</small>
               </div>
             </div>
             <div className="floating-card card-bottom">
@@ -76,67 +71,52 @@ export default function Landing() {
                 <i />
               </div>
               <div>
-                <b>Cada passo conta.</b>
-                <small>Seu progresso, mais claro.</small>
+                <b>{t("steps")}</b>
+                <small>{t("progress")}</small>
               </div>
               <MoveUpRight size={20} />
             </div>
-            <span className="art-coordinate">
-              01 / INFINITAS POSSIBILIDADES
-            </span>
+            <span className="art-coordinate">{t("possibilities")}</span>
           </div>
         </section>
         <section className="manifesto wrap">
-          <span className="eyebrow">MENOS RUÍDO. MAIS APRENDIZADO.</span>
-          <h2>
-            Estudar faz mais sentido
-            <br />
-            quando faz sentido para você.
-          </h2>
+          <span className="eyebrow">{t("focus")}</span>
+          <h2>{t("meaning")}</h2>
           <div className="feature-grid">
             <article>
               <Focus />
-              <h3>Um desafio do seu tamanho</h3>
-              <p>
-                Questões que se adaptam ao seu conhecimento, sem pular etapas
-                nem prender você no básico.
-              </p>
+              <h3>{t("adaptiveTitle")}</h3>
+              <p>{t("adaptiveDescription")}</p>
             </article>
             <article>
               <RotateCcw />
-              <h3>O que importa, na memória</h3>
-              <p>
-                Seus erros viram oportunidades. Revisite os assuntos no momento
-                de consolidar o aprendizado.
-              </p>
+              <h3>{t("memoryTitle")}</h3>
+              <p>{t("memoryDescription")}</p>
             </article>
             <article>
               <Sparkles />
-              <h3>Clareza em cada passo</h3>
-              <p>
-                Acompanhe seus pontos fortes, pratique com simulados e saiba
-                onde concentrar sua energia.
-              </p>
+              <h3>{t("clarityTitle")}</h3>
+              <p>{t("clarityDescription")}</p>
             </article>
           </div>
         </section>
         <section className="cta wrap">
           <div>
-            <span className="eyebrow">COMECE DE ONDE VOCÊ ESTÁ</span>
-            <h2>{brand.slogan}</h2>
+            <span className="eyebrow">{t("ctaEyebrow")}</span>
+            <h2>{t("slogan")}</h2>
             <p>
-              <Check size={16} /> Questões · Simulados · Progresso
+              <Check size={16} /> {t("features")}
             </p>
           </div>
           <Link href="/cadastro" className="button primary">
-            Encontrar meu próximo nível <ArrowRight size={18} />
+            {t("nextLevel")} <ArrowRight size={18} />
           </Link>
         </section>
       </main>
       <footer className="wrap public-footer">
         <Logo />
-        <span>Conhecimento que conecta.</span>
-        <Link href="/privacidade">Privacidade</Link>
+        <span>{t("footer")}</span>
+        <Link href="/privacidade">{t("privacy")}</Link>
       </footer>
     </div>
   );

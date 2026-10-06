@@ -1,5 +1,6 @@
 "use client";
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   importQuestions,
   saveQuestion,
@@ -20,10 +21,16 @@ export function Admin({
   subjects,
   topics,
   questions,
+  total,
+  query,
+  page,
 }: {
   subjects: { id: string; name: string }[];
   topics: { id: string; name: string; subject_id: string }[];
   questions: Row[];
+  total: number;
+  query: string;
+  page: number;
 }) {
   const [importState, importAction, importing] = useActionState(
     importQuestions,
@@ -32,12 +39,30 @@ export function Admin({
   const [state, action, pending] = useActionState(saveQuestion, {});
   const [catalog, catalogAction, saving] = useActionState(saveCatalog, {});
   const [editing, setEditing] = useState<Row | null>(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(query);
+  const router = useRouter();
+  const [searching, startSearch] = useTransition();
   const [section, setSection] = useState("questions");
-  const [page, setPage] = useState(0);
-  const filtered = questions.filter((q) =>
-    q.statement.toLowerCase().includes(search.toLowerCase()),
-  );
+  function goToPage(next: number) {
+    startSearch(() =>
+      router.replace(`/admin?q=${encodeURIComponent(search)}&page=${next}`, {
+        scroll: false,
+      }),
+    );
+  }
+  useEffect(() => {
+    if (search === query) return;
+    const timer = setTimeout(
+      () =>
+        startSearch(() =>
+          router.replace(`/admin?q=${encodeURIComponent(search)}&page=0`, {
+            scroll: false,
+          }),
+        ),
+      350,
+    );
+    return () => clearTimeout(timer);
+  }, [search, query, router]);
   return (
     <div className="form-stack">
       <nav className="tabs" aria-label="Ferramentas de conteúdo">
@@ -66,12 +91,12 @@ export function Admin({
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setPage(0);
             }}
             placeholder="Buscar no enunciado"
+            maxLength={256}
           />
         </label>
-        <div className="table-scroll">
+        <div className="table-scroll" aria-busy={searching || search !== query}>
           <table>
             <thead>
               <tr>
@@ -81,7 +106,7 @@ export function Admin({
               </tr>
             </thead>
             <tbody>
-              {filtered.slice(page * 10, (page + 1) * 10).map((q) => (
+              {questions.map((q) => (
                 <tr key={q.id}>
                   <td>{q.statement.slice(0, 90)}</td>
                   <td>{q.status}</td>
@@ -104,18 +129,18 @@ export function Admin({
         <div className="toolbar">
           <button
             className="button small secondary"
-            disabled={page === 0}
-            onClick={() => setPage((p) => p - 1)}
+            disabled={page === 0 || searching}
+            onClick={() => goToPage(page - 1)}
           >
             Anterior
           </button>
           <span>
-            Página {page + 1} de {Math.max(1, Math.ceil(filtered.length / 10))}
+            Página {page + 1} de {Math.max(1, Math.ceil(total / 10))}
           </span>
           <button
             className="button small secondary"
-            disabled={(page + 1) * 10 >= filtered.length}
-            onClick={() => setPage((p) => p + 1)}
+            disabled={(page + 1) * 10 >= total || searching}
+            onClick={() => goToPage(page + 1)}
           >
             Próxima
           </button>

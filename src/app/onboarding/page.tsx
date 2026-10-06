@@ -2,8 +2,10 @@ import { requireUser } from "@/lib/supabase";
 import { OnboardingForm } from "@/components/onboarding-form";
 import { Logo } from "@/components/logo";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 export default async function Onboarding() {
   const { db, user } = await requireUser();
+  const t = await getTranslations("onboarding");
   const [{ data: subjects, error }, { data: profile }] = await Promise.all([
     db.from("subjects").select("*").order("position"),
     db.from("profiles").select("*").eq("id", user.id).single(),
@@ -17,11 +19,9 @@ export default async function Onboarding() {
       </header>
       <main id="main" className="wrap">
         <section className="onboarding">
-          <span className="eyebrow">UM CAMINHO SÓ SEU</span>
-          <h1>O que você quer alcançar?</h1>
-          <p>
-            Conte um pouco sobre você. O resto, a gente descobre no caminho.
-          </p>
+          <span className="eyebrow">{t("eyebrow")}</span>
+          <h1>{t("title")}</h1>
+          <p>{t("description")}</p>
           <OnboardingForm subjects={subjects || []} />
         </section>
       </main>

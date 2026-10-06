@@ -1,5 +1,6 @@
 "use client";
 import { useSyncExternalStore } from "react";
+import { useTranslations } from "next-intl";
 function subscribe(listener: () => void) {
   window.addEventListener("online", listener);
   window.addEventListener("offline", listener);
@@ -9,6 +10,7 @@ function subscribe(listener: () => void) {
   };
 }
 export function ConnectionStatus() {
+  const t = useTranslations("errors");
   const online = useSyncExternalStore(
     subscribe,
     () => navigator.onLine,
@@ -16,8 +18,7 @@ export function ConnectionStatus() {
   );
   return online ? null : (
     <div className="connection-status" role="status">
-      Você está offline. Aguarde a conexão antes de enviar sua resposta. O
-      progresso já confirmado está salvo.
+      {t("offline")}
     </div>
   );
 }

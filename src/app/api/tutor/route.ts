@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { createTutorRouter } from "@/lib/ai";
 import { brand } from "@/config/brand";
 import type { Database } from "@/lib/database.types";
+import { getLocale } from "next-intl/server";
+import { isLocale, fallbackLocale } from "@/i18n/config";
 export async function POST(request: Request) {
   if (request.headers.get("origin") !== new URL(brand.url).origin)
     return Response.json({ error: "Origem inválida." }, { status: 403 });
@@ -78,10 +80,10 @@ export async function POST(request: Request) {
     { auth: { persistSession: false } },
   );
   try {
-    const result = await createTutorRouter().explain(
-      parsed.data.prompt,
-      context,
-    );
+    const locale = await getLocale();
+    const result = await createTutorRouter(
+      isLocale(locale) ? locale : fallbackLocale,
+    ).explain(parsed.data.prompt, context);
     const { error: saveError } = await service.rpc("finish_ai", {
       p_usage: usage,
       p_user: user.id,

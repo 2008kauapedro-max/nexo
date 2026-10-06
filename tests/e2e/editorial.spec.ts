@@ -77,6 +77,10 @@ test("error reflection and draft editorial changes persist", async ({
   await login(page, 2);
   await page.goto("/admin");
   await page.getByLabel("Pesquisar", { exact: true }).fill("Na equação");
+  await expect(page.locator(".table-scroll")).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
   // Factory drafts stay unpublished; edit only an existing generated draft.
   let draft = page.locator("tbody tr").filter({ hasText: "draft" }).first();
   if ((await draft.count()) === 0) {
@@ -105,6 +109,10 @@ test("error reflection and draft editorial changes persist", async ({
   );
   await page.reload();
   await page.getByLabel("Pesquisar", { exact: true }).fill(statement);
+  await expect(page.locator(".table-scroll")).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
   await page
     .locator("tbody tr")
     .filter({ hasText: statement })

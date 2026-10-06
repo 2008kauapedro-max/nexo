@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 const sections = [
   ["Conta e segurança", "/configuracoes/conta", "E-mail, senha e acesso"],
   ["Aprendizagem", "/preferencias", "Objetivos, matérias e meta diária"],
@@ -20,6 +21,7 @@ const sections = [
   ],
 ];
 export default function Settings() {
+  const t = useTranslations("settings.language");
   return (
     <>
       <div className="page-heading">
@@ -29,7 +31,10 @@ export default function Settings() {
           <p>Encontre o que precisa, uma escolha por vez.</p>
         </div>
       </div>
-      {sections.map(([name, href, description]) => (
+      {[
+        [t("title"), "/configuracoes/idioma", t("description")],
+        ...sections,
+      ].map(([name, href, description]) => (
         <Link className="row-card" key={href} href={href}>
           <div>
             <h2>{name}</h2>

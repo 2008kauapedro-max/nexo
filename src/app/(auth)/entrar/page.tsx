@@ -1,25 +1,26 @@
 import Link from "next/link";
 import { AuthForm } from "@/components/auth-form";
+import { getTranslations } from "next-intl/server";
 export default async function Login({
   searchParams,
 }: {
   searchParams: Promise<{ erro?: string }>;
 }) {
   const { erro } = await searchParams;
+  const t = await getTranslations("auth");
   return (
     <section className="auth-card">
-      <span className="eyebrow">BOM TER VOCÊ AQUI</span>
-      <h1>Continue de onde parou.</h1>
-      <p>Seu próximo passo está esperando.</p>
+      <span className="eyebrow">{t("welcome")}</span>
+      <h1>{t("loginTitle")}</h1>
+      <p>{t("loginDescription")}</p>
       {erro && (
         <p role="alert" className="notice error">
-          Não foi possível confirmar o acesso. O link pode ter expirado. Tente
-          entrar ou recuperar sua senha.
+          {t("expired")}
         </p>
       )}
       <AuthForm mode="login" />
       <p className="auth-switch">
-        Ainda não tem conta? <Link href="/cadastro">Comece gratuitamente</Link>
+        {t("noAccount")} <Link href="/cadastro">{t("startFree")}</Link>
       </p>
     </section>
   );

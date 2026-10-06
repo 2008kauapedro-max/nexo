@@ -3,45 +3,53 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { brand } from "@/config/brand";
+import { getTranslations } from "next-intl/server";
 export interface ActionState {
   error?: string;
   success?: string;
 }
 const credentials = z.object({
   email: z.email().max(254),
-  password: z.string().min(10, "Use pelo menos 10 caracteres.").max(128),
+  password: z.string().min(10).max(128),
 });
 export async function authenticate(
   mode: "login" | "signup" | "reset" | "update",
   _previous: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  const t = await getTranslations("auth");
   const db = await supabase();
   const email = String(form.get("email") || "").trim();
   const password = String(form.get("password") || "");
   if (mode === "reset") {
     if (!z.email().max(254).safeParse(email).success)
-      return { error: "Digite um e-mail válido." };
+      return { error: t("invalidEmail") };
     await db.auth.resetPasswordForEmail(email, {
       redirectTo: `${brand.url}/auth/callback?next=/redefinir-senha`,
     });
     return {
-      success:
-        "Se existir uma conta com esse e-mail, você receberá um link para redefinir sua senha.",
+      success: t("recoverySent"),
     };
   }
   if (mode === "update") {
     if (password.length < 10 || password.length > 128)
-      return { error: "Use entre 10 e 128 caracteres." };
+      return { error: t("invalidPassword") };
     const { error } = await db.auth.updateUser({ password });
     if (error)
       return {
-        error: "Link expirado ou sessão inválida. Solicite um novo link.",
+        error: t("invalidSession"),
       };
     redirect("/inicio");
   }
   const parsed = credentials.safeParse({ email, password });
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success)
+    return {
+      error: t(
+        parsed.error.issues[0].path[0] === "email"
+          ? "invalidEmail"
+          : "invalidPassword",
+      ),
+    };
   const { data, error } =
     mode === "signup"
       ? await db.auth.signUp({
@@ -51,14 +59,11 @@ export async function authenticate(
       : await db.auth.signInWithPassword(parsed.data);
   if (error)
     return {
-      error:
-        mode === "login"
-          ? "Não foi possível entrar. Confira seus dados ou tente novamente mais tarde."
-          : "Não foi possível criar sua conta. Tente novamente mais tarde ou recupere sua senha.",
+      error: mode === "login" ? t("loginError") : t("signupError"),
     };
   if (!data.session)
     return {
-      success: "Confira seu e-mail para confirmar o cadastro e começar.",
+      success: t("confirmEmail"),
     };
   redirect("/inicio");
 }

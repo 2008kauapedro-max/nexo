@@ -1,11 +1,13 @@
 import { AuthForm } from "@/components/auth-form";
 import { requireUser } from "@/lib/supabase";
+import { getTranslations } from "next-intl/server";
 export default async function Update() {
   await requireUser();
+  const t = await getTranslations("auth");
   return (
     <section className="auth-card">
-      <h1>Sua nova senha.</h1>
-      <p>Escolha uma senha única com pelo menos 10 caracteres.</p>
+      <h1>{t("updateTitle")}</h1>
+      <p>{t("updateDescription")}</p>
       <AuthForm mode="update" />
     </section>
   );

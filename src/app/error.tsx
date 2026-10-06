@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 export default function ErrorPage({
   reset,
   error,
@@ -6,13 +7,14 @@ export default function ErrorPage({
   reset: () => void;
   error: Error & { digest?: string };
 }) {
+  const t = useTranslations("errors");
   return (
     <main id="main" className="empty-state">
-      <h1>Não conseguimos carregar agora.</h1>
-      <p>Seus dados continuam salvos. Tente novamente em alguns instantes.</p>
-      {error.digest && <p>Referência do erro: {error.digest}</p>}
+      <h1>{t("title")}</h1>
+      <p>{t("description")}</p>
+      {error.digest && <p>{t("reference", { id: error.digest })}</p>}
       <button className="button primary" onClick={reset}>
-        Tentar novamente
+        {t("retry")}
       </button>
     </main>
   );

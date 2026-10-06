@@ -629,39 +629,54 @@ export type Database = {
       }
       profiles: {
         Row: {
+          content_locale: string
           created_at: string
           daily_goal: number
+          date_format: string
           goal: string
           id: string
           last_study_day: string | null
           level: string
           name: string
           onboarding_complete: boolean
+          region: string
           streak: number
+          time_zone: string
+          ui_locale: string | null
           xp: number
         }
         Insert: {
+          content_locale?: string
           created_at?: string
           daily_goal?: number
+          date_format?: string
           goal?: string
           id: string
           last_study_day?: string | null
           level?: string
           name?: string
           onboarding_complete?: boolean
+          region?: string
           streak?: number
+          time_zone?: string
+          ui_locale?: string | null
           xp?: number
         }
         Update: {
+          content_locale?: string
           created_at?: string
           daily_goal?: number
+          date_format?: string
           goal?: string
           id?: string
           last_study_day?: string | null
           level?: string
           name?: string
           onboarding_complete?: boolean
+          region?: string
           streak?: number
+          time_zone?: string
+          ui_locale?: string | null
           xp?: number
         }
         Relationships: []
@@ -779,10 +794,13 @@ export type Database = {
           exam: string
           fingerprint: string
           id: string
+          locale: string
           options: Json
           question_type: string
+          review_status: string
           skills: string[]
           source: string
+          source_language: string
           source_year: number | null
           statement: string
           status: string
@@ -790,6 +808,9 @@ export type Database = {
           subtopic_id: string | null
           tags: string[]
           topic_id: string
+          translation_of: string | null
+          translation_source: string | null
+          translation_status: string
           updated_at: string
         }
         Insert: {
@@ -798,10 +819,13 @@ export type Database = {
           exam?: string
           fingerprint: string
           id?: string
+          locale?: string
           options: Json
           question_type?: string
+          review_status?: string
           skills?: string[]
           source?: string
+          source_language?: string
           source_year?: number | null
           statement: string
           status?: string
@@ -809,6 +833,9 @@ export type Database = {
           subtopic_id?: string | null
           tags?: string[]
           topic_id: string
+          translation_of?: string | null
+          translation_source?: string | null
+          translation_status?: string
           updated_at?: string
         }
         Update: {
@@ -817,10 +844,13 @@ export type Database = {
           exam?: string
           fingerprint?: string
           id?: string
+          locale?: string
           options?: Json
           question_type?: string
+          review_status?: string
           skills?: string[]
           source?: string
+          source_language?: string
           source_year?: number | null
           statement?: string
           status?: string
@@ -828,6 +858,9 @@ export type Database = {
           subtopic_id?: string | null
           tags?: string[]
           topic_id?: string
+          translation_of?: string | null
+          translation_source?: string | null
+          translation_status?: string
           updated_at?: string
         }
         Relationships: [
@@ -851,6 +884,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "topics"
             referencedColumns: ["id", "subject_id"]
+          },
+          {
+            foreignKeyName: "questions_translation_of_fkey"
+            columns: ["translation_of"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1222,10 +1262,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      activity_feedback: {
-        Args: { p_lesson: string }
-        Returns: Json
-      }
+      activity_feedback: { Args: { p_lesson: string }; Returns: Json }
       admin_catalog: {
         Args: {
           p_id?: string
@@ -1239,6 +1276,10 @@ export type Database = {
       admin_health: { Args: never; Returns: Json }
       admin_quality: { Args: never; Returns: Json }
       admin_questions: { Args: never; Returns: Json }
+      admin_questions_page: {
+        Args: { p_page?: number; p_search?: string }
+        Returns: Json
+      }
       admin_record_cost: {
         Args: {
           p_amount: number
@@ -1330,6 +1371,7 @@ export type Database = {
         Returns: Json
       }
       sync_notifications: { Args: never; Returns: undefined }
+      valid_time_zone: { Args: { p_zone: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

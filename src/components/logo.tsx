@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { brand } from "@/config/brand";
+import { useTranslations } from "next-intl";
 export function Logo() {
+  const t = useTranslations("navigation");
   return (
-    <Link href="/" className="logo" aria-label={`${brand.name} — início`}>
+    <Link href="/" className="logo" aria-label={`${brand.name} — ${t("home")}`}>
       <svg
         className="brand-symbol"
         viewBox="0 0 40 40"

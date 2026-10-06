@@ -3,19 +3,31 @@ import Link from "next/link";
 import { z } from "zod";
 import { requireProfile } from "@/lib/supabase";
 import { Admin } from "@/components/admin";
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; page?: string }>;
+}) {
+  const params = await searchParams;
+  const query = (params.q || "").slice(0, 256);
+  const page = Math.max(
+    0,
+    Math.min(100000, Number.parseInt(params.page || "0", 10) || 0),
+  );
   const { db } = await requireProfile();
   const { data: role } = await db.rpc("admin_role");
   if (role === "FINANCE_ADMIN") redirect("/admin/financeiro");
-  const { data: admin } = await db.rpc("is_admin");
-  if (!admin) notFound();
+  if (role !== "SUPER_ADMIN" && role !== "CONTENT_ADMIN") notFound();
   const [{ data: subjects }, { data: topics }, { data: questions, error }] =
     await Promise.all([
-      db.from("subjects").select("*"),
-      db.from("topics").select("*"),
-      db.rpc("admin_questions"),
+      db.from("subjects").select("id,name"),
+      db.from("topics").select("id,name,subject_id"),
+      db.rpc("admin_questions_page", { p_search: query, p_page: page }),
     ]);
   if (error) throw error;
+  const response = z
+    .object({ rows: z.unknown(), total: z.number() })
+    .parse(questions);
   const parsed = z
     .array(
       z.object({
@@ -30,7 +42,7 @@ export default async function AdminPage() {
         explanation: z.string(),
       }),
     )
-    .parse(questions);
+    .parse(response.rows);
   return (
     <>
       <div className="page-heading">
@@ -58,6 +70,9 @@ export default async function AdminPage() {
         subjects={subjects || []}
         topics={topics || []}
         questions={parsed}
+        total={response.total}
+        query={query}
+        page={page}
       />
     </>
   );

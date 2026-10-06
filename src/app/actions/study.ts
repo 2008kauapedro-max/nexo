@@ -5,10 +5,12 @@ import { z } from "zod";
 import { requireUser } from "@/lib/supabase";
 import { onboardingSchema } from "@/domain/validation";
 import type { ActionState } from "./auth";
+import { getLocale, getTranslations } from "next-intl/server";
 export async function savePreferences(
   _previous: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  const t = await getTranslations();
   const parsed = onboardingSchema.safeParse({
     name: form.get("name"),
     goal: form.get("goal"),
@@ -18,9 +20,14 @@ export async function savePreferences(
   });
   if (!parsed.success)
     return {
-      error: "Confira seu nome, objetivo e selecione ao menos uma matéria.",
+      error: t("onboarding.invalid"),
     };
-  const { db } = await requireUser();
+  const { db, user } = await requireUser();
+  const { error: localeError } = await db
+    .from("profiles")
+    .update({ ui_locale: await getLocale() })
+    .eq("id", user.id);
+  if (localeError) return { error: t("common.saveError") };
   const p = parsed.data;
   const { error } = await db.rpc("save_preferences", {
     p_name: p.name,
@@ -29,7 +36,7 @@ export async function savePreferences(
     p_level: p.level,
     p_daily_goal: p.dailyGoal,
   });
-  if (error) return { error: "Não foi possível salvar. Tente novamente." };
+  if (error) return { error: t("common.saveError") };
   revalidatePath("/inicio");
   redirect(p.level === "unknown" ? "/diagnostico" : "/inicio");
 }

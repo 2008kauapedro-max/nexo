@@ -2,11 +2,14 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { authenticate, type ActionState } from "@/app/actions/auth";
+import { useTranslations } from "next-intl";
 export function AuthForm({
   mode,
 }: {
   mode: "login" | "signup" | "reset" | "update";
 }) {
+  const t = useTranslations("auth");
+  const common = useTranslations("common");
   const [state, action, pending] = useActionState(
     authenticate.bind(null, mode),
     {} as ActionState,
@@ -15,12 +18,12 @@ export function AuthForm({
     <form action={action} className="form-stack">
       {mode !== "update" && (
         <label>
-          E-mail
+          {t("email")}
           <input
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="voce@exemplo.com"
+            placeholder={t("emailPlaceholder")}
             required
             maxLength={254}
           />
@@ -28,7 +31,7 @@ export function AuthForm({
       )}
       {mode !== "reset" && (
         <label>
-          Senha
+          {t("password")}
           <input
             name="password"
             type="password"
@@ -38,7 +41,7 @@ export function AuthForm({
             minLength={10}
             maxLength={128}
             required
-            placeholder="Pelo menos 10 caracteres"
+            placeholder={t("passwordPlaceholder")}
           />
         </label>
       )}
@@ -53,18 +56,11 @@ export function AuthForm({
         </p>
       )}
       <button className="button primary full" disabled={pending}>
-        {pending
-          ? "Aguarde…"
-          : {
-              login: "Entrar",
-              signup: "Criar minha conta",
-              reset: "Enviar link de recuperação",
-              update: "Salvar nova senha",
-            }[mode]}
+        {pending ? common("wait") : t(mode)}
       </button>
       {mode === "login" && (
         <Link className="text-link" href="/esqueci-senha">
-          Esqueci minha senha
+          {t("forgot")}
         </Link>
       )}
     </form>

@@ -2,6 +2,9 @@
 import { useActionState } from "react";
 import { savePreferences } from "@/app/actions/study";
 import { goals } from "@/domain/validation";
+import { LanguageSelector } from "./language-selector";
+import { useTranslations } from "next-intl";
+import { goalKeys, subjectKeys } from "@/i18n/taxonomy";
 export function OnboardingForm({
   subjects,
   name = "",
@@ -16,11 +19,15 @@ export function OnboardingForm({
     subjects: string[];
   };
 }) {
+  const t = useTranslations("onboarding");
+  const g = useTranslations("goals");
+  const subjectLabel = useTranslations("subjects");
   const [state, action, pending] = useActionState(savePreferences, {});
   return (
     <form action={action} className="form-stack">
+      <LanguageSelector />
       <label>
-        Como podemos chamar você?
+        {t("name")}
         <input
           name="name"
           autoComplete="given-name"
@@ -28,19 +35,21 @@ export function OnboardingForm({
           minLength={2}
           maxLength={60}
           defaultValue={name}
-          placeholder="Seu nome"
+          placeholder={t("namePlaceholder")}
         />
       </label>
       <label>
-        O que você quer alcançar?
+        {t("title")}
         <select name="goal" defaultValue={initial?.goal || "ENEM"}>
-          {goals.map((g) => (
-            <option key={g}>{g}</option>
+          {goals.map((goal) => (
+            <option key={goal} value={goal}>
+              {g(goalKeys[goal])}
+            </option>
           ))}
         </select>
       </label>
       <fieldset>
-        <legend>Quais matérias fazem parte do seu caminho?</legend>
+        <legend>{t("subjects")}</legend>
         <div className="choice-grid">
           {subjects.map((s) => (
             <label
@@ -55,27 +64,29 @@ export function OnboardingForm({
                 value={s.id}
                 defaultChecked={initial?.subjects.includes(s.id)}
               />
-              {s.name}
+              {subjectKeys[s.name] ? subjectLabel(subjectKeys[s.name]) : s.name}
             </label>
           ))}
         </div>
       </fieldset>
       <label>
-        Qual é seu nível hoje?
+        {t("level")}
         <select name="level" defaultValue={initial?.level || "unknown"}>
-          <option value="unknown">Não sei — quero descobrir</option>
-          <option value="initial">Estou começando</option>
-          <option value="intermediate">Já tenho uma base</option>
-          <option value="advanced">Quero desafios avançados</option>
+          {["unknown", "initial", "intermediate", "advanced"].map((level) => (
+            <option key={level} value={level}>
+              {t(level)}
+            </option>
+          ))}
         </select>
       </label>
       <label>
-        Sua meta diária
+        {t("dailyGoal")}
         <select name="dailyGoal" defaultValue={initial?.daily_goal || 10}>
-          <option value="5">5 questões · um começo leve</option>
-          <option value="10">10 questões · criando constância</option>
-          <option value="20">20 questões · um passo além</option>
-          <option value="30">30 questões · foco total</option>
+          {[5, 10, 20, 30].map((n) => (
+            <option key={n} value={n}>
+              {t(`goal${n}`)}
+            </option>
+          ))}
         </select>
       </label>
       {state.error && (
@@ -84,7 +95,7 @@ export function OnboardingForm({
         </p>
       )}
       <button disabled={pending} className="button primary">
-        {pending ? "Salvando seu caminho…" : "Vamos começar →"}
+        {t(pending ? "saving" : "start")}
       </button>
     </form>
   );

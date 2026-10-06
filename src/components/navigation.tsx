@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Home,
   BookOpen,
@@ -9,18 +10,19 @@ import {
   UserRound,
 } from "lucide-react";
 const items = [
-  { href: "/inicio", label: "Início", icon: Home },
-  { href: "/estudar", label: "Estudar", icon: BookOpen },
-  { href: "/simulados", label: "Simulados", icon: ClipboardList },
-  { href: "/ia", label: "IA", icon: Sparkles },
-  { href: "/perfil", label: "Perfil", icon: UserRound },
+  { href: "/inicio", label: "home", icon: Home },
+  { href: "/estudar", label: "study", icon: BookOpen },
+  { href: "/simulados", label: "simulations", icon: ClipboardList },
+  { href: "/ia", label: "ai", icon: Sparkles },
+  { href: "/perfil", label: "profile", icon: UserRound },
 ];
 export function Navigation({ mobile = false }: { mobile?: boolean }) {
   const path = usePathname();
+  const t = useTranslations("navigation");
   return (
     <nav
       className={mobile ? "bottom-nav" : ""}
-      aria-label={mobile ? "Navegação principal móvel" : "Navegação principal"}
+      aria-label={t(mobile ? "mobile" : "main")}
     >
       {items.map(({ href, label, icon: Icon }) => (
         <Link
@@ -30,7 +32,7 @@ export function Navigation({ mobile = false }: { mobile?: boolean }) {
           aria-current={path.startsWith(href) ? "page" : undefined}
         >
           <Icon size={19} />
-          <span>{label}</span>
+          <span>{t(label)}</span>
         </Link>
       ))}
     </nav>

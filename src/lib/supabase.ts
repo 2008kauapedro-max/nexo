@@ -31,13 +31,17 @@ export async function supabase() {
     },
   );
 }
-export const requireUser = cache(async function requireUser() {
+export const currentIdentity = cache(async function currentIdentity() {
   const db = await supabase();
   const { data, error } = await db.auth.getUser();
-  if (error || !data.user) redirect("/entrar");
-  return { db, user: data.user };
+  return { db, user: error ? null : data.user };
 });
-export const requireProfile = cache(async function requireProfile() {
+export const requireUser = cache(async function requireUser() {
+  const identity = await currentIdentity();
+  if (!identity.user) redirect("/entrar");
+  return { db: identity.db, user: identity.user };
+});
+export const currentProfile = cache(async function currentProfile() {
   const { db, user } = await requireUser();
   const { data: profile, error } = await db
     .from("profiles")
@@ -46,6 +50,10 @@ export const requireProfile = cache(async function requireProfile() {
     .single();
   if (error)
     throw new Error("Não foi possível carregar seu perfil. Tente novamente.");
-  if (!profile.onboarding_complete) redirect("/onboarding");
   return { db, user, profile };
+});
+export const requireProfile = cache(async function requireProfile() {
+  const result = await currentProfile();
+  if (!result.profile.onboarding_complete) redirect("/onboarding");
+  return result;
 });

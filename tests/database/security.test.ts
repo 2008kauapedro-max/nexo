@@ -31,6 +31,49 @@ afterAll(async () => {
   await db.close();
 });
 describe("database permissions with two independent identities", () => {
+  it("stores locale independently without granting access to progress or other profiles", async () => {
+    await asUser(
+      alice,
+      `update public.profiles set ui_locale='ja',region='BR',date_format='ymd',time_zone='Asia/Tokyo' where id='${alice}'`,
+    );
+    const own = await asUser(
+      alice,
+      `select ui_locale,content_locale,region,time_zone from public.profiles`,
+    );
+    expect(own.rows[0]).toMatchObject({
+      ui_locale: "ja",
+      content_locale: "pt-BR",
+      region: "BR",
+      time_zone: "Asia/Tokyo",
+    });
+    expect(
+      (
+        await asUser(
+          bob,
+          `update public.profiles set ui_locale='de' where id='${alice}' returning id`,
+        )
+      ).rows,
+    ).toHaveLength(0);
+    await expect(
+      asUser(alice, `update public.profiles set xp=99999 where id='${alice}'`),
+    ).rejects.toThrow();
+    await expect(
+      asUser(
+        alice,
+        `update public.profiles set ui_locale='xx' where id='${alice}'`,
+      ),
+    ).rejects.toThrow();
+    await expect(
+      asUser(
+        alice,
+        `update public.profiles set time_zone='Invalid/Zone' where id='${alice}'`,
+      ),
+    ).rejects.toThrow();
+    await asUser(
+      alice,
+      `update public.profiles set ui_locale='pt-BR',time_zone='America/Sao_Paulo' where id='${alice}'`,
+    );
+  });
   it("keeps notes and flashcards private across CRUD operations", async () => {
     const note = (
       await asUser(
@@ -411,5 +454,68 @@ describe("database permissions with two independent identities", () => {
       ).rows,
     ).toEqual([{ plan_id: "pro", status: "active" }]);
     await db.exec(`delete from public.subscriptions where user_id='${bob}'`);
+  });
+  it("paginates editorial search on the server and denies students", async () => {
+    await expect(
+      asUser(bob, "select public.admin_questions_page('',0)"),
+    ).rejects.toThrow(/FORBIDDEN/);
+    await db.exec(`insert into private.admins(user_id,role) values('${alice}','CONTENT_ADMIN') on conflict(user_id) do update set role='CONTENT_ADMIN';
+      insert into public.questions(subject_id,topic_id,statement,options,difficulty,fingerprint) select '${subject}','${topic}','Paginação QA '||n,'["a","b"]',1,'pagination-'||n from generate_series(1,13)n;
+      insert into private.question_answers(question_id,answer,explanation) select id,0,'Explicação de teste isolado.' from public.questions where fingerprint like 'pagination-%';`);
+    const first = (
+      await asUser(
+        alice,
+        "select public.admin_questions_page('Paginação QA',0) as page",
+      )
+    ).rows[0] as { page: { total: number; rows: { id: string }[] } };
+    const second = (
+      await asUser(
+        alice,
+        "select public.admin_questions_page('Paginação QA',1) as page",
+      )
+    ).rows[0] as typeof first;
+    expect(first.page.total).toBe(13);
+    expect(first.page.rows).toHaveLength(10);
+    expect(second.page.rows).toHaveLength(3);
+    expect(
+      new Set([...first.page.rows, ...second.page.rows].map((r) => r.id)).size,
+    ).toBe(13);
+    await expect(
+      asUser(alice, "select public.admin_questions_page('',-1)"),
+    ).rejects.toThrow(/INVALID_INPUT/);
+    await db.exec(
+      `delete from public.questions where fingerprint like 'pagination-%';delete from private.admins where user_id='${alice}';`,
+    );
+  });
+  it("requires review and provenance before a translated question can be published", async () => {
+    await expect(
+      db.exec(
+        `insert into public.questions(subject_id,topic_id,statement,options,difficulty,fingerprint,status,locale,translation_of,translation_status) values('${subject}','${topic}','A translated question?','["a","b"]',1,'translation-test','published','en-US','${question}','draft')`,
+      ),
+    ).rejects.toThrow(/reviewed_translation_publication/);
+    await db.exec(
+      `insert into public.questions(subject_id,topic_id,statement,options,difficulty,fingerprint,status,locale,translation_of,translation_status) values('${subject}','${topic}','A translated question?','["a","b"]',1,'translation-test','draft','en-US','${question}','draft')`,
+    );
+    await expect(
+      db.exec(
+        "update public.questions set status='published' where fingerprint='translation-test'",
+      ),
+    ).rejects.toThrow();
+    await db.exec(
+      "update public.questions set translation_status='reviewed',review_status='approved',translation_source='Human editorial review',status='published' where fingerprint='translation-test'",
+    );
+    expect(
+      (
+        await db.query(
+          "select source_language,translation_status from public.questions where fingerprint='translation-test'",
+        )
+      ).rows[0],
+    ).toMatchObject({
+      source_language: "pt-BR",
+      translation_status: "reviewed",
+    });
+    await db.exec(
+      "delete from public.questions where fingerprint='translation-test'",
+    );
   });
 });
