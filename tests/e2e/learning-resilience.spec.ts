@@ -119,6 +119,9 @@ test("question survives refresh and failed request then accepts retry once", asy
   await expect(page.locator(".feedback")).toBeVisible();
   await page.goto("/inicio");
   await page.goto(address);
+  await expect(page.locator(".question-top")).toContainText("Questão 1 de 5");
+  await expect(page.locator(".feedback")).toBeVisible();
+  await page.getByRole("button", { name: "Próxima questão", exact: true }).click();
   await expect(page.locator(".question-top")).toContainText("Questão 2 de 5");
 });
 test("content factory produces drafts and quality reporting is readable", async ({

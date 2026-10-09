@@ -1101,6 +1101,21 @@ svg {
     padding: 25px;
   }
 }
+@media (max-width: 600px) {
+  .public-header {
+    height: auto;
+    min-height: 96px;
+    padding-block: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .public-header nav {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
 @media (max-width: 374px) {
   .wrap {
     width: calc(100% - 32px);

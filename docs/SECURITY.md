@@ -60,3 +60,5 @@ Auditoria remota somente leitura em 21 tabelas não retornou dados cruzados entr
 
 Lint, typecheck, 46 testes unitários/banco e build passaram. E2E de reautenticação passou com Auth real; suíte ampla em revisão. npm audit --omit=dev retornou zero vulnerabilidades nesta data. CI agora inclui auditoria de dependências de runtime e scanner de segredos do histórico Git completo. Traces de navegador foram desativados porque requisições de autenticação carregam credenciais.
 
+Suíte ampla no build de produção local: 23/30 passaram inicialmente. Corrigido overflow do cabeçalho público com seletor de idioma e atualizada expectativa de restauração da questão; os sete cenários afetados passaram na repetição direcionada (30 cenários cobertos no conjunto das duas rodadas, não uma execução única verde). O teste que exige onboarding ainda não concluído foi excluído desta rodada para preservar as contas QA existentes. Verificação visual de rotas expandidas passou em dez viewports. Scanner: 212 arquivos rastreados e 380 blobs históricos, zero achados pelos padrões implementados.
+
