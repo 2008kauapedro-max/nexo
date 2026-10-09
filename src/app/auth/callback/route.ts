@@ -5,7 +5,7 @@ import { brand } from "@/config/brand";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  if (code) {
+  if (!url.searchParams.has("error") && code && code.length <= 2048) {
     const db = await supabase();
     const { error } = await db.auth.exchangeCodeForSession(code);
     if (!error)

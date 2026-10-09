@@ -3,6 +3,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { authenticate, type ActionState } from "@/app/actions/auth";
 import { useTranslations } from "next-intl";
+import { Captcha } from "./captcha";
 export function AuthForm({
   mode,
 }: {
@@ -45,6 +46,7 @@ export function AuthForm({
           />
         </label>
       )}
+      {mode !== "update" && <Captcha resetKey={state} />}
       {state.error && (
         <p role="alert" className="notice error">
           {state.error}

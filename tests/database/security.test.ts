@@ -21,6 +21,8 @@ beforeAll(async () => {
   await db.exec(
     `create role anon; create role authenticated; create role service_role; create schema auth; create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$; grant usage on schema auth to authenticated,anon;`,
   );
+  await db.exec(`create table auth.sessions(id uuid primary key,user_id uuid not null references auth.users(id) on delete cascade);
+    create function auth.jwt() returns jsonb language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb$$;`);
   for (const file of readdirSync("supabase/migrations").sort())
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   await db.exec(
@@ -31,6 +33,77 @@ afterAll(async () => {
   await db.close();
 });
 describe("database permissions with two independent identities", () => {
+  it("validates reports, keeps duplicates idempotent at the limit and isolates reporters", async () => {
+    const reporter = "00000000-0000-4000-8000-000000000088";
+    await db.exec(`insert into auth.users values('${reporter}');
+      insert into public.questions(subject_id,topic_id,statement,options,difficulty,status,fingerprint)
+      select '${subject}','${topic}','Security report fixture '||n,'["a","b"]',1,case when n=13 then 'draft' else 'published' end,'report-test-'||n from generate_series(1,13)n;
+      insert into private.question_answers(question_id,answer,explanation) select id,0,'Isolated report test fixture answer.' from public.questions where fingerprint like 'report-test-%';`);
+    const fixtures = (
+      await db.query<{ id: string; status: string }>(
+        "select id,status from public.questions where fingerprint like 'report-test-%' order by fingerprint",
+      )
+    ).rows;
+    const published = fixtures.filter((q) => q.status === "published");
+    const report = (
+      id: string,
+      reason = "'Outro'",
+      detail = "'security-test'",
+    ) => `select public.report_question('${id}',${reason},${detail})`;
+    await expect(asUser(reporter, report(question, "null"))).rejects.toThrow(
+      /INVALID_INPUT/,
+    );
+    await expect(
+      asUser(reporter, report(question, "'invalid'")),
+    ).rejects.toThrow(/INVALID_INPUT/);
+    await expect(
+      asUser(reporter, report(question, "'Outro'", "repeat('x',1001)")),
+    ).rejects.toThrow(/INVALID_INPUT/);
+    await expect(
+      asUser(reporter, report("99999999-9999-4999-8999-999999999999")),
+    ).rejects.toThrow(/NOT_FOUND/);
+    await expect(
+      asUser(reporter, report(fixtures.find((q) => q.status === "draft")!.id)),
+    ).rejects.toThrow(/NOT_FOUND/);
+    for (const q of published.slice(0, 10))
+      await asUser(reporter, report(q.id));
+    await asUser(
+      reporter,
+      report(
+        published[0].id,
+        "'Outro'",
+        "'changed detail must not replace original'",
+      ),
+    );
+    await expect(asUser(reporter, report(published[10].id))).rejects.toThrow(
+      /RATE_LIMIT/,
+    );
+    expect(
+      (
+        await asUser(
+          reporter,
+          "select count(*)::int as count from public.question_reports",
+        )
+      ).rows,
+    ).toEqual([{ count: 10 }]);
+    expect(
+      (
+        await asUser(
+          reporter,
+          `select detail from public.question_reports where question_id='${published[0].id}'`,
+        )
+      ).rows,
+    ).toEqual([{ detail: "security-test" }]);
+    expect(
+      (
+        await asUser(
+          bob,
+          `select id from public.question_reports where user_id='${reporter}'`,
+        )
+      ).rows,
+    ).toEqual([]);
+    await asUser(bob, report(published[0].id));
+  });
   it("stores locale independently without granting access to progress or other profiles", async () => {
     await asUser(
       alice,

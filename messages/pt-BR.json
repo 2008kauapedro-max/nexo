@@ -258,5 +258,26 @@
     "unconfirmed": "Não foi possível confirmar o envio. Tente novamente.",
     "existing": "Você já enviou um relato para esta questão. O relato anterior foi preservado.",
     "received": "Recebemos seu relato para revisão. Obrigado por ajudar a melhorar o conteúdo."
+  },
+  "security": {
+    "deleteTitle": "Excluir minha conta",
+    "deleteWarning": "Esta ação remove sua conta e seu histórico de estudos permanentemente. Baixe seus dados antes de continuar.",
+    "deleteConfirm": "Digite EXCLUIR para confirmar",
+    "password": "Senha atual",
+    "reauthError": "Confirme sua senha atual para continuar. Se necessário, entre novamente na sua conta.",
+    "deleteError": "Não foi possível excluir sua conta. Tente novamente.",
+    "deleteButton": "Excluir minha conta permanentemente",
+    "captcha": "Verificação de segurança",
+    "captchaError": "Conclua a verificação de segurança e tente novamente.",
+    "dangerZone": "Zona de risco",
+    "cancel": "Cancelar",
+    "continue": "Continuar",
+    "verifyIdentity": "Confirmar minha identidade",
+    "factorCode": "Código do autenticador",
+    "factorError": "Confira o código atual do autenticador e tente novamente.",
+    "identityVerified": "Identidade confirmada para esta etapa. Nenhum dado foi excluído.",
+    "deletionPending": "A exclusão está temporariamente indisponível enquanto concluímos a verificação de segurança. Sua conta continua ativa.",
+    "methodPending": "A reautenticação para exclusão ainda não está disponível para este método de login. Sua conta permanece ativa.",
+    "adminDeletion": "Antes de excluir esta conta, suas responsabilidades administrativas precisam ser transferidas por um procedimento autorizado."
   }
 }

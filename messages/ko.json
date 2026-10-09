@@ -258,5 +258,26 @@
     "unconfirmed": "전송 여부를 확인하지 못했어요. 다시 시도해 주세요.",
     "existing": "이미 신고한 문제예요. 이전 신고 내용이 유지돼요.",
     "received": "검토할 수 있도록 신고를 접수했어요. 콘텐츠 개선에 도움을 주셔서 감사해요."
+  },
+  "security": {
+    "deleteTitle": "계정 삭제",
+    "deleteWarning": "계정과 학습 기록이 영구적으로 삭제돼요. 계속하기 전에 데이터를 다운로드해 주세요.",
+    "deleteConfirm": "확인하려면 EXCLUIR를 입력해 주세요",
+    "password": "현재 비밀번호",
+    "reauthError": "계속하려면 현재 비밀번호를 확인해 주세요. 필요하면 다시 로그인해 주세요.",
+    "deleteError": "계정을 삭제하지 못했어요. 다시 시도해 주세요.",
+    "deleteButton": "계정 영구 삭제",
+    "captcha": "보안 확인",
+    "captchaError": "보안 확인을 완료한 후 다시 시도해 주세요.",
+    "dangerZone": "주의가 필요한 작업",
+    "cancel": "취소",
+    "continue": "계속",
+    "verifyIdentity": "본인 확인",
+    "factorCode": "인증 앱 코드",
+    "factorError": "인증 앱의 현재 코드를 확인하고 다시 시도해 주세요.",
+    "identityVerified": "이 단계의 본인 확인이 완료됐어요. 삭제된 데이터는 없어요.",
+    "deletionPending": "보안 확인을 마칠 때까지 계정 삭제를 일시적으로 이용할 수 없어요. 계정은 계속 활성 상태예요.",
+    "methodPending": "이 로그인 방식은 아직 계정 삭제를 위한 재인증을 지원하지 않아요. 계정은 계속 활성 상태예요.",
+    "adminDeletion": "계정을 삭제하기 전에 승인된 절차로 관리자 책임을 이전해야 해요."
   }
 }

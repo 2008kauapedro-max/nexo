@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { DeleteAccount } from "@/components/delete-account";
-export default function Data() {
+import { accountSecurity } from "@/lib/account-security";
+export default async function Data() {
+  const access = await accountSecurity();
   return (
     <section className="reading-container">
       <h1>Seus dados.</h1>
@@ -13,7 +15,11 @@ export default function Data() {
       <Link className="row-card" href="/privacidade">
         Ler a política de privacidade →
       </Link>
-      <DeleteAccount />
+      <DeleteAccount
+        password={access.password}
+        hasMfa={access.hasMfa}
+        admin={access.admin}
+      />
     </section>
   );
 }

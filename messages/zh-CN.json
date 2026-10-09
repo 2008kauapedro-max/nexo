@@ -258,5 +258,26 @@
     "unconfirmed": "无法确认是否已发送。请重试。",
     "existing": "你已报告过这道题。此前的报告已保留。",
     "received": "我们已收到你的报告，将进行审核。感谢你帮助改进内容。"
+  },
+  "security": {
+    "deleteTitle": "删除我的账户",
+    "deleteWarning": "此操作将永久删除你的账户和学习记录。继续前请下载数据。",
+    "deleteConfirm": "输入 EXCLUIR 以确认",
+    "password": "当前密码",
+    "reauthError": "请确认当前密码以继续。必要时请重新登录。",
+    "deleteError": "无法删除账户。请重试。",
+    "deleteButton": "永久删除我的账户",
+    "captcha": "安全验证",
+    "captchaError": "请完成安全验证后重试。",
+    "dangerZone": "高风险操作",
+    "cancel": "取消",
+    "continue": "继续",
+    "verifyIdentity": "确认身份",
+    "factorCode": "身份验证器验证码",
+    "factorError": "请检查身份验证器的当前验证码后重试。",
+    "identityVerified": "此步骤的身份确认已完成。尚未删除任何数据。",
+    "deletionPending": "安全检查完成前，账户删除功能暂不可用。你的账户仍保持有效。",
+    "methodPending": "此登录方式暂不支持删除账户所需的重新验证。你的账户仍保持有效。",
+    "adminDeletion": "删除此账户前，必须通过授权流程移交管理职责。"
   }
 }

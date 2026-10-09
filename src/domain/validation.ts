@@ -35,5 +35,6 @@ export const questionSchema = z
     path: ["answer"],
   });
 export function safeRedirect(path: string | null) {
-  return path && /^\/(?!\/)[a-zA-Z0-9/_-]*$/.test(path) ? path : "/inicio";
+  // Callback destinations are a closed list, not merely URLs that look internal.
+  return path === "/redefinir-senha" ? path : "/inicio";
 }

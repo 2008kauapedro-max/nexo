@@ -1,5 +1,11 @@
 # Ativação dos serviços externos
 
+## CAPTCHA (preparado, ainda não ativado)
+
+Criar widget Turnstile para os domínios reais do NEXO. Salvar apenas a site key pública em `NEXT_PUBLIC_TURNSTILE_SITE_KEY` na Vercel NEXO. A secret key fica na configuração CAPTCHA do Supabase NEXO, com o provider Turnstile habilitado. O servidor encaminha o token para Supabase Auth nos fluxos de login, cadastro, recuperação e reautenticação para exclusão; é o Auth que valida o desafio. Um widget isolado não protege a API Auth direta. Não validar o mesmo token duas vezes em serviços diferentes.
+
+A CSP permite somente o domínio específico do desafio quando há site key. Sem configuração, nenhum script Turnstile é carregado e não se afirma proteção anti-bot ativa. Após ativar: token ausente, inválido, expirado e repetido devem falhar no Auth direto; teste também envio legítimo e recuperação neutra. Nunca usar chaves de teste em produção. [Configuração oficial](https://supabase.com/docs/guides/auth/auth-captcha).
+
 ## E-mail
 
 Destino exclusivo: Supabase NEXO `jseljonjvpkurvhwqsjh` → Authentication → Emails → SMTP Settings.

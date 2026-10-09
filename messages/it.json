@@ -258,5 +258,26 @@
     "unconfirmed": "Impossibile confermare l’invio. Riprova.",
     "existing": "Hai già segnalato questa domanda. La segnalazione precedente è stata conservata.",
     "received": "Abbiamo ricevuto la segnalazione per la revisione. Grazie per aiutarci a migliorare i contenuti."
+  },
+  "security": {
+    "deleteTitle": "Elimina il mio account",
+    "deleteWarning": "Questa azione elimina definitivamente il tuo account e la cronologia di studio. Scarica i tuoi dati prima di continuare.",
+    "deleteConfirm": "Digita EXCLUIR per confermare",
+    "password": "Password attuale",
+    "reauthError": "Conferma la password attuale per continuare. Se necessario, accedi di nuovo.",
+    "deleteError": "Impossibile eliminare l’account. Riprova.",
+    "deleteButton": "Elimina definitivamente il mio account",
+    "captcha": "Verifica di sicurezza",
+    "captchaError": "Completa la verifica di sicurezza e riprova.",
+    "dangerZone": "Zona a rischio",
+    "cancel": "Annulla",
+    "continue": "Continua",
+    "verifyIdentity": "Conferma la mia identità",
+    "factorCode": "Codice dell’app di autenticazione",
+    "factorError": "Controlla il codice attuale dell’app di autenticazione e riprova.",
+    "identityVerified": "Identità confermata per questo passaggio. Nessun dato è stato eliminato.",
+    "deletionPending": "L’eliminazione è temporaneamente non disponibile mentre completiamo i controlli di sicurezza. Il tuo account resta attivo.",
+    "methodPending": "La riautenticazione per eliminare l’account non è ancora disponibile per questo metodo di accesso. Il tuo account resta attivo.",
+    "adminDeletion": "Prima di eliminare questo account, le responsabilità amministrative devono essere trasferite tramite una procedura autorizzata."
   }
 }

@@ -258,5 +258,26 @@
     "unconfirmed": "Der Versand konnte nicht bestätigt werden. Versuche es erneut.",
     "existing": "Du hast diese Frage bereits gemeldet. Deine vorherige Meldung bleibt erhalten.",
     "received": "Deine Meldung wurde zur Prüfung eingereicht. Danke für deinen Beitrag zur Verbesserung der Inhalte."
+  },
+  "security": {
+    "deleteTitle": "Mein Konto löschen",
+    "deleteWarning": "Dadurch werden dein Konto und dein Lernverlauf dauerhaft gelöscht. Lade zuerst deine Daten herunter.",
+    "deleteConfirm": "Gib zur Bestätigung EXCLUIR ein",
+    "password": "Aktuelles Passwort",
+    "reauthError": "Bestätige dein aktuelles Passwort. Melde dich bei Bedarf erneut an.",
+    "deleteError": "Dein Konto konnte nicht gelöscht werden. Versuche es erneut.",
+    "deleteButton": "Mein Konto dauerhaft löschen",
+    "captcha": "Sicherheitsprüfung",
+    "captchaError": "Schließe die Sicherheitsprüfung ab und versuche es erneut.",
+    "dangerZone": "Gefahrenbereich",
+    "cancel": "Abbrechen",
+    "continue": "Weiter",
+    "verifyIdentity": "Meine Identität bestätigen",
+    "factorCode": "Code der Authenticator-App",
+    "factorError": "Prüfe den aktuellen Code deiner Authenticator-App und versuche es erneut.",
+    "identityVerified": "Identität für diesen Schritt bestätigt. Es wurden keine Daten gelöscht.",
+    "deletionPending": "Die Kontolöschung ist vorübergehend nicht verfügbar, während wir die Sicherheitsprüfung abschließen. Dein Konto bleibt aktiv.",
+    "methodPending": "Die erneute Authentifizierung zur Kontolöschung ist für diese Anmeldemethode noch nicht verfügbar. Dein Konto bleibt aktiv.",
+    "adminDeletion": "Vor der Kontolöschung müssen die administrativen Zuständigkeiten in einem autorisierten Verfahren übertragen werden."
   }
 }

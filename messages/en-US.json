@@ -258,5 +258,26 @@
     "unconfirmed": "Could not confirm delivery. Try again.",
     "existing": "You already reported this question. Your previous report has been kept.",
     "received": "Your report is ready for review. Thank you for helping improve the content."
+  },
+  "security": {
+    "deleteTitle": "Delete my account",
+    "deleteWarning": "This permanently deletes your account and study history. Download your data before continuing.",
+    "deleteConfirm": "Type EXCLUIR to confirm",
+    "password": "Current password",
+    "reauthError": "Confirm your current password to continue. Sign in again if needed.",
+    "deleteError": "Could not delete your account. Try again.",
+    "deleteButton": "Permanently delete my account",
+    "captcha": "Security verification",
+    "captchaError": "Complete the security check and try again.",
+    "dangerZone": "Danger zone",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "verifyIdentity": "Confirm my identity",
+    "factorCode": "Authenticator code",
+    "factorError": "Check the current authenticator code and try again.",
+    "identityVerified": "Identity confirmed for this step. No data has been deleted.",
+    "deletionPending": "Account deletion is temporarily unavailable while we complete the security checks. Your account remains active.",
+    "methodPending": "Reauthentication for deletion is not yet available for this sign-in method. Your account remains active.",
+    "adminDeletion": "Before this account can be deleted, its administrative responsibilities must be transferred through an authorized process."
   }
 }

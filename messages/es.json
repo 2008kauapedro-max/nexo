@@ -258,5 +258,26 @@
     "unconfirmed": "No se pudo confirmar el envío. Inténtalo de nuevo.",
     "existing": "Ya has informado sobre esta pregunta. Se ha conservado el informe anterior.",
     "received": "Hemos recibido tu informe para revisión. Gracias por ayudar a mejorar el contenido."
+  },
+  "security": {
+    "deleteTitle": "Eliminar mi cuenta",
+    "deleteWarning": "Esta acción elimina tu cuenta y tu historial de estudio de forma permanente. Descarga tus datos antes de continuar.",
+    "deleteConfirm": "Escribe EXCLUIR para confirmar",
+    "password": "Contraseña actual",
+    "reauthError": "Confirma tu contraseña actual para continuar. Si es necesario, vuelve a iniciar sesión.",
+    "deleteError": "No se pudo eliminar tu cuenta. Inténtalo de nuevo.",
+    "deleteButton": "Eliminar mi cuenta permanentemente",
+    "captcha": "Verificación de seguridad",
+    "captchaError": "Completa la verificación de seguridad e inténtalo de nuevo.",
+    "dangerZone": "Zona de riesgo",
+    "cancel": "Cancelar",
+    "continue": "Continuar",
+    "verifyIdentity": "Confirmar mi identidad",
+    "factorCode": "Código del autenticador",
+    "factorError": "Revisa el código actual del autenticador e inténtalo de nuevo.",
+    "identityVerified": "Identidad confirmada para este paso. No se ha eliminado ningún dato.",
+    "deletionPending": "La eliminación está temporalmente deshabilitada mientras completamos las comprobaciones de seguridad. Tu cuenta sigue activa.",
+    "methodPending": "La reautenticación para eliminar la cuenta aún no está disponible con este método de acceso. Tu cuenta sigue activa.",
+    "adminDeletion": "Antes de eliminar esta cuenta, sus responsabilidades administrativas deben transferirse mediante un procedimiento autorizado."
   }
 }

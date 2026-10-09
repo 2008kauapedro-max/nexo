@@ -2,6 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { AiRouter, type TutorProvider } from "@/domain/ai-router";
 import { type Locale, fallbackLocale } from "@/i18n/config";
+import { boundedText } from "./request";
 const responseSchema = z.object({
   choices: z
     .array(
@@ -28,6 +29,7 @@ export class CompatibleTutor implements TutorProvider {
       base.toString().replace(/\/$/, "") + "/chat/completions",
       {
         method: "POST",
+        redirect: "error",
         signal: AbortSignal.timeout(18000),
         headers: {
           Authorization: "Bearer " + this.config.key,
@@ -53,7 +55,9 @@ export class CompatibleTutor implements TutorProvider {
       },
     );
     if (!response.ok) throw new Error("Provider unavailable");
-    const result = responseSchema.parse(await response.json());
+    const result = responseSchema.parse(
+      JSON.parse(await boundedText(response, 64000)),
+    );
     return {
       text: result.choices[0].message.content,
       tokens: result.usage?.total_tokens || 0,

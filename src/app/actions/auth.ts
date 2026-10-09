@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { brand } from "@/config/brand";
 import { getTranslations } from "next-intl/server";
+import { captchaToken } from "@/domain/captcha";
+import { securityEvent } from "@/lib/security-events";
 export interface ActionState {
   error?: string;
   success?: string;
@@ -18,6 +20,21 @@ export async function authenticate(
   form: FormData,
 ): Promise<ActionState> {
   const t = await getTranslations("auth");
+  const security = await getTranslations("security");
+  if (!["login", "signup", "reset", "update"].includes(mode))
+    return { error: t("loginError") };
+  let token: string | undefined;
+  if (mode !== "update") {
+    try {
+      token = captchaToken(
+        form.get("captchaToken"),
+        !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+      );
+    } catch {
+      securityEvent("captcha_required");
+      return { error: security("captchaError") };
+    }
+  }
   const db = await supabase();
   const email = String(form.get("email") || "").trim();
   const password = String(form.get("password") || "");
@@ -25,6 +42,7 @@ export async function authenticate(
     if (!z.email().max(254).safeParse(email).success)
       return { error: t("invalidEmail") };
     await db.auth.resetPasswordForEmail(email, {
+      captchaToken: token,
       redirectTo: `${brand.url}/auth/callback?next=/redefinir-senha`,
     });
     return {
@@ -54,13 +72,21 @@ export async function authenticate(
     mode === "signup"
       ? await db.auth.signUp({
           ...parsed.data,
-          options: { emailRedirectTo: `${brand.url}/auth/callback` },
+          options: {
+            emailRedirectTo: `${brand.url}/auth/callback`,
+            captchaToken: token,
+          },
         })
-      : await db.auth.signInWithPassword(parsed.data);
-  if (error)
+      : await db.auth.signInWithPassword({
+          ...parsed.data,
+          options: { captchaToken: token },
+        });
+  if (error) {
+    securityEvent("auth_rejected");
     return {
       error: mode === "login" ? t("loginError") : t("signupError"),
     };
+  }
   if (!data.session)
     return {
       success: t("confirmEmail"),

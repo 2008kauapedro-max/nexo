@@ -79,6 +79,10 @@ describe("trust boundaries", () => {
       "//evil.test",
       "/\\evil.test",
       "/%2f%2fevil.test",
+      "/auth/callback",
+      "/admin",
+      "/entrar",
+      "/redefinir-senha?next=https://evil.test",
       null,
     ])
       expect(safeRedirect(path)).toBe("/inicio");

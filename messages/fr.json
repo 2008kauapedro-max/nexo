@@ -258,5 +258,26 @@
     "unconfirmed": "Impossible de confirmer l’envoi. Réessayez.",
     "existing": "Vous avez déjà signalé cette question. Votre signalement précédent est conservé.",
     "received": "Votre signalement a été reçu pour examen. Merci de contribuer à améliorer le contenu."
+  },
+  "security": {
+    "deleteTitle": "Supprimer mon compte",
+    "deleteWarning": "Cette action supprime définitivement votre compte et votre historique d’étude. Téléchargez vos données avant de continuer.",
+    "deleteConfirm": "Saisissez EXCLUIR pour confirmer",
+    "password": "Mot de passe actuel",
+    "reauthError": "Confirmez votre mot de passe actuel pour continuer. Reconnectez-vous si nécessaire.",
+    "deleteError": "Impossible de supprimer votre compte. Réessayez.",
+    "deleteButton": "Supprimer définitivement mon compte",
+    "captcha": "Vérification de sécurité",
+    "captchaError": "Terminez la vérification de sécurité et réessayez.",
+    "dangerZone": "Zone sensible",
+    "cancel": "Annuler",
+    "continue": "Continuer",
+    "verifyIdentity": "Confirmer mon identité",
+    "factorCode": "Code de l’application d’authentification",
+    "factorError": "Vérifiez le code actuel de votre application et réessayez.",
+    "identityVerified": "Identité confirmée pour cette étape. Aucune donnée n’a été supprimée.",
+    "deletionPending": "La suppression est temporairement indisponible pendant la finalisation des contrôles de sécurité. Votre compte reste actif.",
+    "methodPending": "La réauthentification pour supprimer le compte n’est pas encore disponible avec cette méthode de connexion. Votre compte reste actif.",
+    "adminDeletion": "Avant de supprimer ce compte, ses responsabilités administratives doivent être transférées par une procédure autorisée."
   }
 }

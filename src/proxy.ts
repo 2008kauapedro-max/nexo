@@ -1,9 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { contentSecurityPolicy } from "@/domain/security-headers";
 export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const dev = process.env.NODE_ENV !== "production";
-  const csp = `default-src 'self'; script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co${dev ? " ws: http://localhost:*" : ""}; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; worker-src 'self';`;
+  const csp = contentSecurityPolicy(nonce, {
+    development: dev,
+    captcha: !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  });
   const headers = new Headers(request.headers);
   headers.set("x-nonce", nonce);
   headers.set("Content-Security-Policy", csp);
@@ -39,6 +43,8 @@ export async function proxy(request: NextRequest) {
   }
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("Cache-Control", "private, no-store");
+  if (request.nextUrl.protocol === "https:")
+    response.headers.set("Strict-Transport-Security", "max-age=31536000");
   return response;
 }
 export const config = {

@@ -1,6 +1,5 @@
 import { getRegionalFormats } from "@/i18n/server-format";
 import Link from "next/link";
-import { DeleteAccount } from "@/components/delete-account";
 import { requireProfile } from "@/lib/supabase";
 import { levelFromXp } from "@/domain/learning";
 import { logout } from "@/app/actions/auth";
@@ -139,7 +138,6 @@ export default async function Profile() {
             </span>
           </Link>
         ))}
-      <DeleteAccount />
     </>
   );
 }

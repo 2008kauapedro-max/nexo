@@ -10,7 +10,8 @@ export default defineConfig({
   use: {
     locale: "pt-BR",
     baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
-    trace: "retain-on-failure",
+    // Auth actions carry credentials: raw network traces must not be retained.
+    trace: "off",
     reducedMotion: "reduce",
     screenshot: "only-on-failure",
   },

@@ -1,4 +1,7 @@
-export async function boundedText(request: Request, limit: number) {
+export async function boundedText(
+  request: Pick<Request, "headers" | "body">,
+  limit: number,
+) {
   if (Number(request.headers.get("content-length") || 0) > limit)
     throw new Error("BODY_LIMIT");
   const reader = request.body?.getReader();

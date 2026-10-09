@@ -15,7 +15,7 @@ Ativos: identidade, histórico educacional, gabaritos, papéis administrativos, 
 | SQL injection          | SDK parametrizado; nomes de tabela em migrations são constantes, nunca payload                                      |
 | XSS/clickjacking       | React escapa conteúdo; CSP com nonce; `frame-ancestors 'none'`; nenhum HTML de usuário renderizado                  |
 | CSRF                   | Proteção de origem de Server Actions; origem explícita no tutor; cookie SameSite Lax                                |
-| Open redirect          | Lista de formato de caminho interno; callback usa origem canônica configurada                                       |
+| Open redirect          | Lista fechada: início ou redefinição de senha; callback usa origem canônica configurada                               |
 | Abuso                  | Limites Auth do Supabase; até 30 sessões/hora; cota diária transacional e intervalo mínimo IA; validação de payload |
 | Webhook falso          | HMAC com comparação constante, janela de 5 minutos, IDs únicos e hash de payload; acesso exclusivo servidor         |
 | Eventos fora de ordem  | Assinatura atualizada somente por evento mais recente                                                               |
@@ -49,4 +49,14 @@ Referências dos advisors: [SECURITY DEFINER](https://supabase.com/docs/guides/d
 Histórico remoto e arquivos locais: dez migrations. Consulta aos catálogos confirmou RLS nas 30 tabelas públicas e nas seis privadas. Nenhuma função pública SECURITY DEFINER acessível a anon ou sem configuração explícita de search_path foi encontrada. Advisors: 26 avisos de RPCs autenticadas SECURITY DEFINER e um de senha vazada dependente de Pro; performance: 25 índices ainda sem uso, nível INFO. Sem upgrade ou alteração de custos.
 
 Testes adicionais exercitam FINANCE_ADMIN sem conteúdo/saúde, isolamento de notas/cartões/reflexões/plano, plano Premium válido versus expirado e roles forjadas em claims. Instrumentação registra rota, método, categoria e digest, sem cookies, cabeçalhos ou texto do aluno. O hook padrão do framework pode registrar o erro original: não lançar segredos como mensagem de erro.
+
+## Checkpoint de 09/10/2026
+
+Histórico remoto confirmado: 14 migrations, incluindo apenas o hardening isolado de report_question. A proposta anterior de delete_account foi retirada e não foi aplicada. Consulte ACCOUNT_DELETION.md e SECURITY_TEST_MATRIX.md para os limites atuais; o novo bloqueio da interface não impede acesso direto à RPC antiga.
+
+Advisors: 28 avisos de funções autenticadas SECURITY DEFINER, 1 de proteção de senhas vazadas desativada e 24 INFO de índices sem uso. Relatos passaram em concorrência remota: uma vaga restante e dez solicitações produziram uma inserção e nove recusas por limite, preservando repetição idempotente.
+
+Auditoria remota somente leitura em 21 tabelas não retornou dados cruzados entre A/B. Onze tabelas tinham registros dos dois usuários, seis tinham registros somente de um e quatro estavam vazias (IA e assinaturas); estas últimas não fornecem prova positiva de isolamento. Resultado em .local/evidence/rls-read-audit.json. CRUD remoto completo continua pendente.
+
+Lint, typecheck, 46 testes unitários/banco e build passaram. E2E de reautenticação passou com Auth real; suíte ampla em revisão. npm audit --omit=dev retornou zero vulnerabilidades nesta data. CI agora inclui auditoria de dependências de runtime e scanner de segredos do histórico Git completo. Traces de navegador foram desativados porque requisições de autenticação carregam credenciais.
 
