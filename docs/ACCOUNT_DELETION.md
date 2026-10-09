@@ -8,6 +8,8 @@ Senha usa signInWithPassword, identidade obtida no servidor e claims verificados
 
 E2E com conta QA e Auth real passou em desenvolvimento e build de produção local: senha incorreta recusada, senha correta confirmada, campo de senha limpo, confirmação final desabilitada, cancelar descarta a prova e a conta permanece ativa. O relógio da estação apresentou atraso de aproximadamente 137 segundos em relação ao Auth; a prova de interface usa o iat assinado da resposta recém-verificada, exclusivamente após signInWithPassword. Isso não substitui o futuro gate de banco usando now() e auth.sessions. Nenhuma exclusão real foi executada.
 
+MFA real via API validado em conta QA isolada: enrollment oficial, senha recente sem fator negada pela política, código incorreto negado pelo Auth e TOTP correto com aal2 aceito. Fator temporário removido e ausência de fatores residuais confirmada. Evidência: scripts/mfa-security-live.mjs e .local/evidence/mfa-security-live.json. Ainda faltam MFA pelo navegador, revogação no gate de banco e exclusão real autorizada; não interpretar este resultado como aprovação da migration.
+
 OAuth/OTP/magic link sem fluxo de reautenticação validado exibem indisponibilidade segura. Não se pede senha a uma sessão identificada somente como OAuth. Integração real com provedor e callbacks ainda pendente. O AMR identifica o método da sessão, não prova ausência de senha na conta: contas com métodos vinculados precisam de descoberta adicional antes de liberar todos os caminhos.
 
 ## Impacto das cascatas atuais

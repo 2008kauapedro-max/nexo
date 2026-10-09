@@ -279,5 +279,31 @@
     "deletionPending": "보안 확인을 마칠 때까지 계정 삭제를 일시적으로 이용할 수 없어요. 계정은 계속 활성 상태예요.",
     "methodPending": "이 로그인 방식은 아직 계정 삭제를 위한 재인증을 지원하지 않아요. 계정은 계속 활성 상태예요.",
     "adminDeletion": "계정을 삭제하기 전에 승인된 절차로 관리자 책임을 이전해야 해요."
+  },
+  "result": {
+    "eyebrow": "한 걸음 한 걸음이 중요해요",
+    "title": "한 걸음 나아갔어요.",
+    "emptyTitle": "모두 마쳤어요.",
+    "description": "{total}문제 중 {correct}문제를 맞혔어요. 계속 나아가 봐요.",
+    "empty": "이 조건에 맞는 문제가 없어요. 다른 과목이나 종합 연습을 선택해 주세요.",
+    "xp": "획득 XP",
+    "time": "문제 풀이 시간",
+    "review": "복습할 문제",
+    "home": "홈으로 돌아가기",
+    "reviewErrors": "틀린 문제 복습",
+    "path": "이번 학습 돌아보기",
+    "correct": "✓ 정답",
+    "answer": "정답:",
+    "understand": "이해하기"
+  },
+  "subject": {
+    "eyebrow": "주제별로 한 걸음씩",
+    "description": "아는 내용을 다지고 다음 단계를 발견해 보세요.",
+    "review": "오답 복습",
+    "quick": "빠른 연습",
+    "topics": "주제",
+    "mastery": "숙련도 {score}% · 답변 {count}개",
+    "starting": "아직 시작 수준을 확인하지 않았어요.",
+    "practice": "연습하기"
   }
 }

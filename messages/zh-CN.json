@@ -279,5 +279,31 @@
     "deletionPending": "安全检查完成前，账户删除功能暂不可用。你的账户仍保持有效。",
     "methodPending": "此登录方式暂不支持删除账户所需的重新验证。你的账户仍保持有效。",
     "adminDeletion": "删除此账户前，必须通过授权流程移交管理职责。"
+  },
+  "result": {
+    "eyebrow": "每一步都算数",
+    "title": "你又进步了。",
+    "emptyTitle": "这里的任务都完成了。",
+    "description": "共 {total} 道题，答对 {correct} 道。继续前进吧。",
+    "empty": "此筛选条件下没有题目。请选择其他科目或综合练习。",
+    "xp": "获得的 XP",
+    "time": "答题用时",
+    "review": "待复习",
+    "home": "返回首页",
+    "reviewErrors": "复习错题",
+    "path": "本次学习回顾",
+    "correct": "✓ 正确",
+    "answer": "答案：",
+    "understand": "理解"
+  },
+  "subject": {
+    "eyebrow": "逐个主题，走出你的学习之路",
+    "description": "巩固已学知识，探索下一步。",
+    "review": "复习错题",
+    "quick": "快速练习",
+    "topics": "主题",
+    "mastery": "掌握程度 {score}% · 已答 {count} 题",
+    "starting": "你的起点尚待发现。",
+    "practice": "练习"
   }
 }

@@ -279,5 +279,31 @@
     "deletionPending": "La suppression est temporairement indisponible pendant la finalisation des contrôles de sécurité. Votre compte reste actif.",
     "methodPending": "La réauthentification pour supprimer le compte n’est pas encore disponible avec cette méthode de connexion. Votre compte reste actif.",
     "adminDeletion": "Avant de supprimer ce compte, ses responsabilités administratives doivent être transférées par une procédure autorisée."
+  },
+  "result": {
+    "eyebrow": "CHAQUE PAS COMPTE",
+    "title": "Vous avez progressé.",
+    "emptyTitle": "Vous êtes à jour.",
+    "description": "{correct} bonnes réponses sur {total} questions. Continuez à avancer.",
+    "empty": "Aucune question ne correspond à ce filtre. Choisissez une autre matière ou un entraînement général.",
+    "xp": "XP gagnés",
+    "time": "Temps passé sur les questions",
+    "review": "À réviser",
+    "home": "Retour à l’accueil",
+    "reviewErrors": "Revoir mes erreurs",
+    "path": "Votre parcours dans cette séance",
+    "correct": "✓ Correct",
+    "answer": "Corrigé :",
+    "understand": "Comprendre"
+  },
+  "subject": {
+    "eyebrow": "VOTRE PARCOURS, SUJET PAR SUJET",
+    "description": "Consolidez vos acquis. Découvrez la suite.",
+    "review": "Revoir les erreurs",
+    "quick": "Entraînement rapide",
+    "topics": "Sujets",
+    "mastery": "{score}% de maîtrise · {count, plural, one {# réponse} other {# réponses}}",
+    "starting": "Votre point de départ reste à découvrir.",
+    "practice": "S’entraîner"
   }
 }

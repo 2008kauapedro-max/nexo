@@ -279,5 +279,31 @@
     "deletionPending": "L’eliminazione è temporaneamente non disponibile mentre completiamo i controlli di sicurezza. Il tuo account resta attivo.",
     "methodPending": "La riautenticazione per eliminare l’account non è ancora disponibile per questo metodo di accesso. Il tuo account resta attivo.",
     "adminDeletion": "Prima di eliminare questo account, le responsabilità amministrative devono essere trasferite tramite una procedura autorizzata."
+  },
+  "result": {
+    "eyebrow": "OGNI PASSO CONTA",
+    "title": "Hai fatto progressi.",
+    "emptyTitle": "Qui è tutto aggiornato.",
+    "description": "{correct} risposte corrette su {total} domande. Continua il tuo percorso.",
+    "empty": "Non ci sono domande per questo filtro. Scegli un’altra materia o una pratica generale.",
+    "xp": "XP ottenuti",
+    "time": "Tempo sulle domande",
+    "review": "Da ripassare",
+    "home": "Torna alla home",
+    "reviewErrors": "Ripassa i miei errori",
+    "path": "Il tuo percorso in questa sessione",
+    "correct": "✓ Corretto",
+    "answer": "Soluzione:",
+    "understand": "Comprendi"
+  },
+  "subject": {
+    "eyebrow": "IL TUO PERCORSO, ARGOMENTO PER ARGOMENTO",
+    "description": "Consolida ciò che sai. Scopri il prossimo passo.",
+    "review": "Ripassa gli errori",
+    "quick": "Pratica veloce",
+    "topics": "Argomenti",
+    "mastery": "{score}% di padronanza · {count, plural, one {# risposta} other {# risposte}}",
+    "starting": "Il tuo punto di partenza è ancora da scoprire.",
+    "practice": "Esercitati"
   }
 }

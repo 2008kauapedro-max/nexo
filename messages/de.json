@@ -279,5 +279,31 @@
     "deletionPending": "Die Kontolöschung ist vorübergehend nicht verfügbar, während wir die Sicherheitsprüfung abschließen. Dein Konto bleibt aktiv.",
     "methodPending": "Die erneute Authentifizierung zur Kontolöschung ist für diese Anmeldemethode noch nicht verfügbar. Dein Konto bleibt aktiv.",
     "adminDeletion": "Vor der Kontolöschung müssen die administrativen Zuständigkeiten in einem autorisierten Verfahren übertragen werden."
+  },
+  "result": {
+    "eyebrow": "JEDER SCHRITT ZÄHLT",
+    "title": "Du bist weitergekommen.",
+    "emptyTitle": "Hier ist alles erledigt.",
+    "description": "{correct} von {total} Fragen richtig. Geh deinen Weg weiter.",
+    "empty": "Für diesen Filter sind keine Fragen verfügbar. Wähle ein anderes Fach oder eine allgemeine Übung.",
+    "xp": "Erhaltene XP",
+    "time": "Zeit für Fragen",
+    "review": "Zum Wiederholen",
+    "home": "Zur Startseite",
+    "reviewErrors": "Meine Fehler wiederholen",
+    "path": "Dein Weg durch diese Einheit",
+    "correct": "✓ Richtig",
+    "answer": "Lösung:",
+    "understand": "Verstehen"
+  },
+  "subject": {
+    "eyebrow": "DEIN WEG, THEMA FÜR THEMA",
+    "description": "Festige dein Wissen. Entdecke, was als Nächstes kommt.",
+    "review": "Fehler wiederholen",
+    "quick": "Kurze Übung",
+    "topics": "Themen",
+    "mastery": "{score}% Beherrschung · {count, plural, one {# Antwort} other {# Antworten}}",
+    "starting": "Dein Ausgangspunkt muss noch ermittelt werden.",
+    "practice": "Üben"
   }
 }

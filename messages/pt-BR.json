@@ -279,5 +279,31 @@
     "deletionPending": "A exclusão está temporariamente indisponível enquanto concluímos a verificação de segurança. Sua conta continua ativa.",
     "methodPending": "A reautenticação para exclusão ainda não está disponível para este método de login. Sua conta permanece ativa.",
     "adminDeletion": "Antes de excluir esta conta, suas responsabilidades administrativas precisam ser transferidas por um procedimento autorizado."
+  },
+  "result": {
+    "eyebrow": "CADA PASSO CONTA",
+    "title": "Você avançou.",
+    "emptyTitle": "Tudo em dia por aqui.",
+    "description": "{correct} acertos em {total} questões. Continue construindo seu caminho.",
+    "empty": "Não há questões disponíveis para este filtro. Escolha outra matéria ou um treino geral.",
+    "xp": "XP conquistado",
+    "time": "Tempo em questões",
+    "review": "Para revisar",
+    "home": "Voltar ao início",
+    "reviewErrors": "Revisar meus erros",
+    "path": "Seu caminho nesta sessão",
+    "correct": "✓ Acertou",
+    "answer": "Gabarito:",
+    "understand": "Entender"
+  },
+  "subject": {
+    "eyebrow": "SEU CAMINHO, ASSUNTO POR ASSUNTO",
+    "description": "Consolide o que sabe. Descubra o que vem depois.",
+    "review": "Revisar erros",
+    "quick": "Treino rápido",
+    "topics": "Assuntos",
+    "mastery": "{score}% de domínio · {count, plural, one {# resposta} other {# respostas}}",
+    "starting": "Seu ponto de partida ainda será descoberto.",
+    "practice": "Treinar"
   }
 }

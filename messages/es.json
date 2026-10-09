@@ -279,5 +279,31 @@
     "deletionPending": "La eliminación está temporalmente deshabilitada mientras completamos las comprobaciones de seguridad. Tu cuenta sigue activa.",
     "methodPending": "La reautenticación para eliminar la cuenta aún no está disponible con este método de acceso. Tu cuenta sigue activa.",
     "adminDeletion": "Antes de eliminar esta cuenta, sus responsabilidades administrativas deben transferirse mediante un procedimiento autorizado."
+  },
+  "result": {
+    "eyebrow": "CADA PASO CUENTA",
+    "title": "Has avanzado.",
+    "emptyTitle": "Todo al día por aquí.",
+    "description": "{correct} aciertos de {total} preguntas. Sigue avanzando.",
+    "empty": "No hay preguntas para este filtro. Elige otra materia o una práctica general.",
+    "xp": "XP ganado",
+    "time": "Tiempo en preguntas",
+    "review": "Para repasar",
+    "home": "Volver al inicio",
+    "reviewErrors": "Repasar mis errores",
+    "path": "Tu recorrido en esta sesión",
+    "correct": "✓ Correcto",
+    "answer": "Respuesta:",
+    "understand": "Entender"
+  },
+  "subject": {
+    "eyebrow": "TU CAMINO, TEMA A TEMA",
+    "description": "Afianza lo que sabes. Descubre lo que viene después.",
+    "review": "Repasar errores",
+    "quick": "Práctica rápida",
+    "topics": "Temas",
+    "mastery": "{score}% de dominio · {count, plural, one {# respuesta} other {# respuestas}}",
+    "starting": "Tu punto de partida está por descubrir.",
+    "practice": "Practicar"
   }
 }

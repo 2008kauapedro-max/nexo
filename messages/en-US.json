@@ -279,5 +279,31 @@
     "deletionPending": "Account deletion is temporarily unavailable while we complete the security checks. Your account remains active.",
     "methodPending": "Reauthentication for deletion is not yet available for this sign-in method. Your account remains active.",
     "adminDeletion": "Before this account can be deleted, its administrative responsibilities must be transferred through an authorized process."
+  },
+  "result": {
+    "eyebrow": "EVERY STEP COUNTS",
+    "title": "You moved forward.",
+    "emptyTitle": "You’re all caught up.",
+    "description": "{correct} correct out of {total} questions. Keep moving forward.",
+    "empty": "No questions are available for this filter. Choose another subject or general practice.",
+    "xp": "XP earned",
+    "time": "Time on questions",
+    "review": "To review",
+    "home": "Back to home",
+    "reviewErrors": "Review my mistakes",
+    "path": "Your progress in this session",
+    "correct": "✓ Correct",
+    "answer": "Answer:",
+    "understand": "Understand"
+  },
+  "subject": {
+    "eyebrow": "YOUR PATH, TOPIC BY TOPIC",
+    "description": "Build on what you know. Discover what comes next.",
+    "review": "Review mistakes",
+    "quick": "Quick practice",
+    "topics": "Topics",
+    "mastery": "{score}% mastery · {count, plural, one {# answer} other {# answers}}",
+    "starting": "Your starting point is still to be discovered.",
+    "practice": "Practise"
   }
 }
