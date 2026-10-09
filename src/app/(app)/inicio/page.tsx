@@ -3,21 +3,28 @@ import { Flame, Target, Zap, ArrowUpRight } from "lucide-react";
 import { requireProfile } from "@/lib/supabase";
 import { levelFromXp } from "@/domain/learning";
 import { StartForm } from "@/components/start-form";
+import { getTranslations } from "next-intl/server";
+import { getRegionalFormats } from "@/i18n/server-format";
 export default async function Home() {
   const { db, profile, user } = await requireProfile();
+  const [t, study, format] = await Promise.all([
+    getTranslations("home"),
+    getTranslations("study"),
+    getRegionalFormats(),
+  ]);
   const today = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Sao_Paulo",
   }).format(new Date());
   const [{ data: usage, error }, { data: sessions }] = await Promise.all([
     db
       .from("usage_counters")
-      .select("*")
+      .select("questions")
       .eq("user_id", user.id)
       .eq("day", today)
       .maybeSingle(),
     db
       .from("learning_sessions")
-      .select("*")
+      .select("id")
       .is("finished_at", null)
       .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
       .order("started_at", { ascending: false })
@@ -28,83 +35,82 @@ export default async function Home() {
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">HOJE · SEU PRÓXIMO PASSO</span>
+          <span className="eyebrow">{t("eyebrow")}</span>
           <h1>
-            Olá, {profile.name.split(" ")[0]}
+            {t("greeting", { name: profile.name.split(" ")[0] })}
             <span className="muted">.</span>
           </h1>
-          <p>Que tal dar mais um passo hoje?</p>
+          <p>{t("description")}</p>
         </div>
-        <span className="pill">Nível {levelFromXp(profile.xp)}</span>
+        <span className="pill">
+          {t("level", { level: format.number(levelFromXp(profile.xp)) })}
+        </span>
       </div>
       <div className="stat-row">
         <div className="stat">
           <span>
-            <Flame size={14} /> Sequência
+            <Flame size={14} /> {t("streak")}
           </span>
-          <strong>
-            {profile.streak}{" "}
-            <small style={{ fontSize: 12, letterSpacing: 0 }}>
-              {profile.streak === 1 ? "dia" : "dias"}
-            </small>
-          </strong>
+          <strong>{t("days", { count: profile.streak })}</strong>
         </div>
         <div className="stat">
           <span>
-            <Zap size={14} /> Conhecimento
+            <Zap size={14} /> {t("knowledge")}
           </span>
           <strong>
-            {profile.xp}{" "}
+            {format.number(profile.xp)}{" "}
             <small style={{ fontSize: 12, letterSpacing: 0 }}>XP</small>
           </strong>
         </div>
         <div className="stat">
           <span>
-            <Target size={14} /> Meta de hoje
+            <Target size={14} /> {t("dailyGoal")}
           </span>
           <strong>
-            {usage?.questions || 0}
+            {format.number(usage?.questions || 0)}
             <small style={{ fontSize: 14, letterSpacing: 0 }}>
               {" "}
-              / {profile.daily_goal}
+              / {format.number(profile.daily_goal)}
             </small>
           </strong>
         </div>
       </div>
       <section className="study-banner">
         <span className="eyebrow">
-          {sessions?.[0]
-            ? "SEU PROGRESSO ESTÁ SALVO"
-            : "UMA SESSÃO CURTA JÁ FAZ DIFERENÇA"}
+          {t(sessions?.[0] ? "saved" : "shortSession")}
         </span>
-        <h2>
-          Seu próximo desafio
-          <br />
-          está aqui.
-        </h2>
-        <p>Uma questão de cada vez. No nível certo para você.</p>
+        <h2>{t("challenge")}</h2>
+        <p>{t("challengeDescription")}</p>
         {sessions?.[0] ? (
-          <Link className="button primary" href={`/sessao/${sessions[0].id}`}>
-            Continuar estudando <ArrowUpRight size={18} />
+          <Link
+            prefetch={false}
+            className="button primary"
+            href={`/sessao/${sessions[0].id}`}
+          >
+            {t("resume")} <ArrowUpRight size={18} />
           </Link>
         ) : (
           <StartForm />
         )}
       </section>
-      <nav className="today-links" aria-label="Outros caminhos de estudo">
-        <Link href="/aprender">
-          Aprender <span>Conceitos e exemplos ↗</span>
+      <nav className="today-links" aria-label={t("otherPaths")}>
+        <Link href="/aprender" prefetch={false}>
+          {study("learn")} <span>{t("concepts")}</span>
         </Link>
-        <Link href="/caderno">
-          Revisar <span>Conectar o que faltou ↗</span>
+        <Link href="/caderno" prefetch={false}>
+          {study("review")} <span>{t("connect")}</span>
         </Link>
         <Link href="/estudar">
-          Explorar <span>Escolher uma matéria ↗</span>
+          {study("explore")} <span>{t("chooseSubject")}</span>
         </Link>
       </nav>
-      <nav className="workspace-links" aria-label="Organizar estudos">
-        <Link href="/plano">Minha semana</Link>
-        <Link href="/missoes">Missões de hoje</Link>
+      <nav className="workspace-links" aria-label={t("organize")}>
+        <Link href="/plano" prefetch={false}>
+          {t("week")}
+        </Link>
+        <Link href="/missoes" prefetch={false}>
+          {t("missions")}
+        </Link>
       </nav>
     </>
   );

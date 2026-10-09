@@ -1,11 +1,12 @@
 "use client";
 import { useActionState } from "react";
 import { startStudy } from "@/app/actions/study";
+import { useTranslations } from "next-intl";
 export function StartForm({
   mode = "practice",
   subject,
   topic,
-  label = "Começar treino",
+  label,
   target = 10,
   source,
 }: {
@@ -16,6 +17,7 @@ export function StartForm({
   target?: number;
   source?: string;
 }) {
+  const t = useTranslations("study");
   const [state, action, pending] = useActionState(startStudy, {});
   return (
     <form action={action}>
@@ -25,7 +27,7 @@ export function StartForm({
       {subject && <input type="hidden" name="subject" value={subject} />}{" "}
       {topic && <input type="hidden" name="topic" value={topic} />}
       <button disabled={pending} className="button primary">
-        {pending ? "Preparando…" : `${label} →`}
+        {pending ? t("preparing") : `${label || t("start")} →`}
       </button>
       {state.error && (
         <p role="alert" className="notice error" style={{ marginTop: 12 }}>

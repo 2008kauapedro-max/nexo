@@ -3,6 +3,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/supabase";
 import type { ActionState } from "./auth";
+import { getTranslations } from "next-intl/server";
 export async function saveNote(
   _state: ActionState,
   form: FormData,
@@ -145,6 +146,7 @@ export async function reportQuestion(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  const t = await getTranslations("report");
   const p = z
     .object({
       question: z.uuid(),
@@ -163,7 +165,7 @@ export async function reportQuestion(
       reason: form.get("reason"),
       detail: form.get("detail") || "",
     });
-  if (!p.success) return { error: "Confira os campos do relato." };
+  if (!p.success) return { error: t("invalid") };
   const { db } = await requireUser();
   const { error } = await db.rpc("report_question", {
     p_question: p.data.question,
@@ -172,23 +174,20 @@ export async function reportQuestion(
   });
   if (error)
     return {
-      error: "Não foi possível enviar agora. Aguarde e tente novamente.",
+      error: t("error"),
     };
   const { data: report, error: readError } = await db
     .from("question_reports")
     .select("detail")
     .eq("question_id", p.data.question)
     .single();
-  if (readError)
-    return { error: "Não foi possível confirmar o envio. Tente novamente." };
+  if (readError) return { error: t("unconfirmed") };
   if (report.detail !== p.data.detail)
     return {
-      success:
-        "Você já enviou um relato para esta questão. O relato anterior foi preservado.",
+      success: t("existing"),
     };
   return {
-    success:
-      "Recebemos seu relato para revisão. Obrigado por ajudar a melhorar o conteúdo.",
+    success: t("received"),
   };
 }
 export async function submitActivity(

@@ -455,6 +455,51 @@ describe("database permissions with two independent identities", () => {
     ).toEqual([{ plan_id: "pro", status: "active" }]);
     await db.exec(`delete from public.subscriptions where user_id='${bob}'`);
   });
+  it("restores the visible question without advancing or leaking answers", async () => {
+    await db.exec(`delete from public.usage_counters where user_id='${alice}'`);
+    for (const mode of ["practice", "simulation"]) {
+      const sid = (
+        await asUser(
+          alice,
+          `select public.start_session('${mode}','${subject}','${topic}',5,30) as id`,
+        )
+      ).rows[0] as { id: string };
+      const served = (
+        await asUser(alice, `select public.next_question('${sid.id}') as q`)
+      ).rows[0] as { q: { id: string } };
+      const call = `select public.session_question_view('${sid.id}','${served.q.id}') as view`;
+      const before = (await asUser(alice, call)).rows[0] as {
+        view: { feedback: unknown };
+      };
+      expect(before.view.feedback).toBeNull();
+      await expect(asUser(bob, call)).rejects.toThrow(/NOT_FOUND/);
+      await asUser(
+        alice,
+        `select public.submit_answer('${sid.id}','${served.q.id}',0)`,
+      );
+      const restored = (await asUser(alice, call)).rows[0] as {
+        view: {
+          selected: number;
+          feedback: { answer: number | null; correct: boolean | null };
+        };
+      };
+      expect(restored.view.selected).toBe(0);
+      if (mode === "simulation")
+        expect(restored.view.feedback).toMatchObject({
+          answer: null,
+          correct: null,
+        });
+      else expect(restored.view.feedback.answer).not.toBeNull();
+      expect(
+        (
+          await asUser(
+            alice,
+            `select current_question_id,answered from public.learning_sessions where id='${sid.id}'`,
+          )
+        ).rows[0],
+      ).toMatchObject({ current_question_id: null, answered: 1 });
+    }
+  });
   it("paginates editorial search on the server and denies students", async () => {
     await expect(
       asUser(bob, "select public.admin_questions_page('',0)"),

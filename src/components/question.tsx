@@ -1,10 +1,10 @@
 "use client";
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, Sparkles, ArrowRight } from "lucide-react";
-import { answerQuestion } from "@/app/actions/study";
+import { answerQuestion, advanceStudy } from "@/app/actions/study";
 import { QuestionReport } from "@/components/workspace-forms";
+import { useTranslations } from "next-intl";
 type Feedback = {
   correct: boolean | null;
   answer: number | null;
@@ -17,6 +17,8 @@ export function Question({
   answered,
   target,
   mode,
+  initialSelected = null,
+  initialFeedback = null,
 }: {
   sessionId: string;
   question: {
@@ -28,12 +30,14 @@ export function Question({
   answered: number;
   target: number;
   mode: string;
+  initialSelected?: number | null;
+  initialFeedback?: Feedback | null;
 }) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const t = useTranslations("question");
+  const [selected, setSelected] = useState<number | null>(initialSelected);
+  const [feedback, setFeedback] = useState<Feedback | null>(initialFeedback);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
-  const router = useRouter();
   function submit() {
     if (selected === null) return;
     startTransition(async () => {
@@ -47,9 +51,7 @@ export function Question({
             navigator.vibrate(20);
         }
       } catch {
-        setError(
-          "A conexão falhou. Sua seleção foi mantida. Tente enviar novamente quando a conexão voltar.",
-        );
+        setError(t("connectionError"));
       }
     });
   }
@@ -58,25 +60,23 @@ export function Question({
       <div className="question-top">
         <span>
           {mode === "diagnostic"
-            ? "Diagnóstico"
+            ? t("diagnostic")
             : mode === "simulation"
-              ? "Modo prova"
-              : "Seu treino"}{" "}
+              ? t("simulation")
+              : t("practice")}{" "}
           ·{" "}
           {question.difficulty <= 3
-            ? "Fácil"
+            ? t("easy")
             : question.difficulty <= 7
-              ? "Médio"
-              : "Difícil"}
+              ? t("medium")
+              : t("hard")}
         </span>
-        <span>
-          Questão {answered + 1} de {target}
-        </span>
+        <span>{t("position", { current: answered + 1, total: target })}</span>
       </div>
       <div
         className="progress"
         role="progressbar"
-        aria-label="Progresso da sessão"
+        aria-label={t("progress")}
         aria-valuenow={answered}
         aria-valuemin={0}
         aria-valuemax={target}
@@ -96,10 +96,10 @@ export function Question({
             <span>{String.fromCharCode(65 + i)}</span>
             <span>{option}</span>
             {feedback?.answer === i && (
-              <CheckCircle2 size={18} aria-label="Alternativa correta" />
+              <CheckCircle2 size={18} aria-label={t("correctOption")} />
             )}
             {feedback && selected === i && feedback.correct === false && (
-              <XCircle size={18} aria-label="Sua resposta estava incorreta" />
+              <XCircle size={18} aria-label={t("incorrectOption")} />
             )}
           </button>
         ))}
@@ -116,23 +116,20 @@ export function Question({
         >
           <strong>
             {feedback.correct === null ? (
-              "Resposta registrada."
+              t("recorded")
             ) : feedback.correct ? (
               <>
                 <CheckCircle2 size={20} />
-                Isso! Mais um passo. +{feedback.xp} XP
+                {t("correct", { xp: feedback.xp })}
               </>
             ) : (
               <>
                 <XCircle size={20} />
-                Faz parte do caminho.
+                {t("incorrect")}
               </>
             )}
           </strong>
-          <p>
-            {feedback.explanation ||
-              "Você verá a correção ao finalizar o simulado."}
-          </p>
+          <p>{feedback.explanation || t("examFeedback")}</p>
         </div>
       )}
       <div className="question-actions">
@@ -141,8 +138,7 @@ export function Question({
             href={`/ia?questao=${question.id}&sessao=${sessionId}`}
             className="button secondary"
           >
-            <Sparkles size={17} />{" "}
-            {feedback ? "Entender melhor" : "Pedir uma dica"}
+            <Sparkles size={17} /> {feedback ? t("understand") : t("hint")}
           </Link>
         )}
         {!feedback ? (
@@ -151,19 +147,28 @@ export function Question({
             onClick={submit}
             className="button primary"
           >
-            {pending ? "Registrando…" : "Confirmar resposta"}
+            {pending ? t("saving") : t("confirm")}
           </button>
         ) : (
           <button
             disabled={pending}
             className="button primary"
-            onClick={() => startTransition(() => router.refresh())}
+            onClick={() =>
+              startTransition(async () => {
+                try {
+                  const result = await advanceStudy(sessionId);
+                  if (result.error) setError(result.error);
+                } catch {
+                  setError(t("connectionError"));
+                }
+              })
+            }
           >
             {pending
-              ? "Carregando…"
+              ? t("loading")
               : answered + 1 >= target
-                ? "Ver resultado"
-                : "Próxima questão"}
+                ? t("result")
+                : t("next")}
             <ArrowRight size={17} />
           </button>
         )}

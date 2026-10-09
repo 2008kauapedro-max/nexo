@@ -1,3 +1,4 @@
+import { getRegionalFormats } from "@/i18n/server-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -19,6 +20,7 @@ const schema = z.object({
 });
 export default async function Finance() {
   const { db } = await requireProfile();
+  const format = await getRegionalFormats();
   const { data: role } = await db.rpc("admin_role");
   if (!["SUPER_ADMIN", "FINANCE_ADMIN"].includes(role || "")) notFound();
   const { data, error } = await db.rpc("admin_finance");
@@ -63,12 +65,7 @@ export default async function Finance() {
                 <tr key={c.id}>
                   <td>{c.category}</td>
                   <td>{c.period}</td>
-                  <td>
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: c.currency,
-                    }).format(c.amount)}
-                  </td>
+                  <td>{format.currency(c.amount, c.currency)}</td>
                 </tr>
               ))}
             </tbody>

@@ -51,6 +51,7 @@ export async function startStudy(
   _previous: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  const t = await getTranslations("question");
   const parsed = sessionSchema.safeParse({
     mode: form.get("mode"),
     subject: form.get("subject") || null,
@@ -58,18 +59,18 @@ export async function startStudy(
     target: Number(form.get("target") || 10),
     minutes: Number(form.get("minutes") || 30),
   });
-  if (!parsed.success) return { error: "Confira a configuração da sessão." };
+  if (!parsed.success) return { error: t("configError") };
   const { db } = await requireUser();
   const p = parsed.data;
   const source = String(form.get("source") || "");
   if (source) {
     if (!z.uuid().safeParse(source).success)
-      return { error: "Sessão inválida." };
+      return { error: t("invalidSession") };
     const { data, error } = await db.rpc("review_session", {
       p_source: source,
     });
-    if (error) return { error: "Não foi possível criar a revisão." };
-    redirect(`/sessao/${data}`);
+    if (error) return { error: t("reviewError") };
+    return advanceStudy(data);
   }
   const { data, error } = await db.rpc("start_session", {
     p_mode: p.mode,
@@ -81,22 +82,23 @@ export async function startStudy(
   if (error)
     return {
       error: error.message.includes("PLAN_LIMIT")
-        ? "Seu plano permite simulados de até 10 questões. Diminua a quantidade para continuar."
-        : "Não foi possível iniciar. Tente novamente em alguns instantes.",
+        ? t("planLimit")
+        : t("startError"),
     };
-  redirect(`/sessao/${data}`);
+  return advanceStudy(data);
 }
 export async function answerQuestion(
   sessionId: string,
   questionId: string,
   selected: number,
 ) {
+  const t = await getTranslations("question");
   if (
     !z.uuid().safeParse(sessionId).success ||
     !z.uuid().safeParse(questionId).success ||
     !z.number().int().min(0).max(4).safeParse(selected).success
   )
-    return { error: "Resposta inválida." };
+    return { error: t("invalidAnswer") };
   const { db } = await requireUser();
   const { data, error } = await db.rpc("submit_answer", {
     p_session: sessionId,
@@ -106,8 +108,8 @@ export async function answerQuestion(
   if (error)
     return {
       error: error.message.includes("DAILY_LIMIT")
-        ? "Você atingiu seu limite diário de questões. Volte amanhã para continuar."
-        : "Não foi possível registrar. A sessão pode ter expirado. Tente novamente.",
+        ? t("dailyLimit")
+        : t("answerError"),
     };
   return {
     data: data as {
@@ -117,4 +119,17 @@ export async function answerQuestion(
       xp: number;
     },
   };
+}
+export async function advanceStudy(sessionId: string): Promise<ActionState> {
+  const t = await getTranslations("common");
+  if (!z.uuid().safeParse(sessionId).success) return { error: t("invalid") };
+  const { db } = await requireUser();
+  const { data, error } = await db.rpc("next_question", {
+    p_session: sessionId,
+  });
+  if (error) return { error: t("saveError") };
+  if (!data) redirect(`/resultado/${sessionId}`);
+  const q = z.object({ id: z.uuid() }).safeParse(data);
+  if (!q.success) return { error: t("saveError") };
+  redirect(`/sessao/${sessionId}?questao=${q.data.id}`);
 }

@@ -1,3 +1,4 @@
+import { getRegionalFormats } from "@/i18n/server-format";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { requireProfile } from "@/lib/supabase";
@@ -17,6 +18,7 @@ const schema = z.object({
 });
 export default async function Health() {
   const { db } = await requireProfile();
+  const format = await getRegionalFormats();
   const { data: role } = await db.rpc("admin_role");
   if (role !== "SUPER_ADMIN") notFound();
   const { data, error } = await db.rpc("admin_health");
@@ -52,11 +54,7 @@ export default async function Health() {
         health.audit.map((a, i) => (
           <div className="row-card" key={`${a.created_at}-${i}`}>
             <span>{a.action}</span>
-            <time>
-              {new Date(a.created_at).toLocaleString("pt-BR", {
-                timeZone: "America/Sao_Paulo",
-              })}
-            </time>
+            <time>{format.dateTime(a.created_at)}</time>
           </div>
         ))
       ) : (

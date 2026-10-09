@@ -1,9 +1,11 @@
+import { getRegionalFormats } from "@/i18n/server-format";
 import { requireProfile } from "@/lib/supabase";
 import { FlashcardForm } from "@/components/workspace-forms";
 import { Flashcard } from "@/components/flashcard";
 import { removeArtifact } from "@/app/actions/workspace";
 export default async function Flashcards() {
   const { db } = await requireProfile();
+  const format = await getRegionalFormats();
   const { data, error } = await db
     .from("flashcards")
     .select("*")
@@ -41,10 +43,7 @@ export default async function Flashcards() {
           <div className="row-card" key={c.id}>
             <div>
               <h3>{c.front}</h3>
-              <p>
-                Próxima revisão:{" "}
-                {new Date(c.next_review).toLocaleDateString("pt-BR")}
-              </p>
+              <p>Próxima revisão: {format.date(c.next_review)}</p>
             </div>
             <details>
               <summary>Excluir</summary>

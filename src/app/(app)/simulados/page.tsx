@@ -1,8 +1,10 @@
+import { getRegionalFormats } from "@/i18n/server-format";
 import Link from "next/link";
 import { requireProfile } from "@/lib/supabase";
 import { SimulationForm } from "@/components/simulation-form";
 export default async function Simulations() {
   const { db } = await requireProfile();
+  const format = await getRegionalFormats();
   const [{ data: subjects, error }, { data: history }] = await Promise.all([
     db.from("subjects").select("*").order("position"),
     db
@@ -35,11 +37,7 @@ export default async function Simulations() {
           {history?.length ? (
             history.map((s) => (
               <Link className="row-card" href={`/resultado/${s.id}`} key={s.id}>
-                <span>
-                  {new Date(s.started_at).toLocaleDateString("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                  })}
-                </span>
+                <span>{format.date(s.started_at)}</span>
                 <strong>
                   {s.correct}/{s.answered} acertos ↗
                 </strong>

@@ -1352,6 +1352,10 @@ export type Database = {
         Returns: undefined
       }
       session_feedback: { Args: { p_session: string }; Returns: Json }
+      session_question_view: {
+        Args: { p_question: string; p_session: string }
+        Returns: Json
+      }
       start_session: {
         Args: {
           p_minutes?: number

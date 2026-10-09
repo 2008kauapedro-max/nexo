@@ -1,3 +1,4 @@
+import { getRegionalFormats } from "@/i18n/server-format";
 import Link from "next/link";
 import { requireProfile } from "@/lib/supabase";
 import { notificationAction } from "@/app/actions/workspace";
@@ -10,6 +11,7 @@ export default async function Notifications({
 }) {
   const { filtro = "todas" } = await searchParams;
   const { db } = await requireProfile();
+  const format = await getRegionalFormats();
   await syncNotifications();
   const { data, error } = await db
     .from("notifications")
@@ -60,9 +62,7 @@ export default async function Notifications({
                 className={`notification-item ${n.read_at ? "" : "unread"}`}
               >
                 <Link href={n.href}>
-                  <span className="eyebrow">
-                    {new Date(n.created_at).toLocaleDateString("pt-BR")}
-                  </span>
+                  <span className="eyebrow">{format.date(n.created_at)}</span>
                   <h2>{n.title}</h2>
                   <p>{n.body}</p>
                 </Link>

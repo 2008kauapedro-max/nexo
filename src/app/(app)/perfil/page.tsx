@@ -1,3 +1,4 @@
+import { getRegionalFormats } from "@/i18n/server-format";
 import Link from "next/link";
 import { DeleteAccount } from "@/components/delete-account";
 import { requireProfile } from "@/lib/supabase";
@@ -5,6 +6,7 @@ import { levelFromXp } from "@/domain/learning";
 import { logout } from "@/app/actions/auth";
 export default async function Profile() {
   const { db, profile } = await requireProfile();
+  const format = await getRegionalFormats();
   const [
     { data: sessions, error },
     { data: mastery },
@@ -129,10 +131,8 @@ export default async function Profile() {
         .map((s) => (
           <Link key={s.id} href={`/resultado/${s.id}`} className="row-card">
             <span>
-              {new Date(s.started_at).toLocaleDateString("pt-BR", {
-                timeZone: "America/Sao_Paulo",
-              })}{" "}
-              · {s.mode === "simulation" ? "Simulado" : "Treino"}
+              {format.date(s.started_at)} ·{" "}
+              {s.mode === "simulation" ? "Simulado" : "Treino"}
             </span>
             <span>
               {s.correct}/{s.answered} ↗

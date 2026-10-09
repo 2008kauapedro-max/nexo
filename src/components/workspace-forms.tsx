@@ -1,5 +1,6 @@
 "use client";
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import {
   saveNote,
   saveFlashcard,
@@ -134,34 +135,37 @@ export function ErrorAnnotation({
   );
 }
 export function QuestionReport({ id }: { id: string }) {
+  const t = useTranslations("report");
   const [state, action, pending] = useActionState(reportQuestion, {});
   return (
     <details className="report-details">
-      <summary>Reportar problema</summary>
+      <summary>{t("title")}</summary>
       <form action={action} className="form-stack">
         <input type="hidden" name="question" value={id} />
         <label>
-          Motivo
+          {t("reason")}
           <select name="reason">
             {[
-              "Resposta incorreta",
-              "Enunciado incorreto",
-              "Imagem quebrada",
-              "Questão duplicada",
-              "Explicação ruim",
-              "Outro",
-            ].map((r) => (
-              <option key={r}>{r}</option>
+              ["Resposta incorreta", "answer"],
+              ["Enunciado incorreto", "statement"],
+              ["Imagem quebrada", "image"],
+              ["Questão duplicada", "duplicate"],
+              ["Explicação ruim", "explanation"],
+              ["Outro", "other"],
+            ].map(([value, key]) => (
+              <option key={value} value={value}>
+                {t(key)}
+              </option>
             ))}
           </select>
         </label>
         <label>
-          Detalhes (opcional)
+          {t("detail")}
           <textarea name="detail" maxLength={1000} />
         </label>
         <Feedback state={state} />
         <button className="button secondary" disabled={pending}>
-          Enviar relato
+          {pending ? t("sending") : t("send")}
         </button>
       </form>
     </details>
