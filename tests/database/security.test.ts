@@ -394,6 +394,15 @@ describe("database permissions with two independent identities", () => {
       (await asUser(bob, "select * from public.study_plan_items")).rows,
     ).toHaveLength(0);
     const lesson = "40000000-0000-4000-8000-000000000001";
+    await expect(
+      asUser(
+        alice,
+        `insert into public.learning_reflections(user_id,lesson_id,explanation) values('${alice}','${lesson}','Somar significa reunir quantidades em um total.')`,
+      ),
+    ).rejects.toThrow(/row-level security/);
+    await db.exec(
+      `insert into public.subscriptions(user_id,plan_id,status,period_end) values('${alice}','premium','active',now()+interval '1 day')`,
+    );
     await asUser(
       alice,
       `insert into public.learning_reflections(user_id,lesson_id,explanation) values('${alice}','${lesson}','Somar significa reunir quantidades em um total.')`,
@@ -413,6 +422,7 @@ describe("database permissions with two independent identities", () => {
     await expect(
       asUser(alice, "select public.admin_quality()"),
     ).rejects.toThrow(/FORBIDDEN/);
+    await db.exec(`delete from public.subscriptions where user_id='${alice}'`);
   });
   it("honors paid limits only for current subscriptions and ignores forged JWT roles", async () => {
     await db.exec(

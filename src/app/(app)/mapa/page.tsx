@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { requireProfile } from "@/lib/supabase";
+import { requirePlanFeature } from "@/lib/plan-access";
 import { retentionEstimate } from "@/domain/retention";
+
 export default async function Knowledge({
   searchParams,
 }: {
   searchParams: Promise<{ materia?: string }>;
 }) {
   const { materia } = await searchParams;
-  const { db } = await requireProfile();
+  const { db } = await requirePlanFeature("knowledge_map");
   const [
     { data: subjects },
     { data: topics },
@@ -20,28 +21,30 @@ export default async function Knowledge({
     db.from("lessons").select("id,title,topic_id"),
   ]);
   const subject = subjects?.find((s) => s.slug === materia);
+
   return (
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">O QUE VOCÊ JÁ CONECTOU</span>
+          <span className="eyebrow">PRO Â· O QUE VOCÃŠ JÃ CONECTOU</span>
           <h1>{subject ? subject.name : "Mapa de conhecimento."}</h1>
           <p>
             {subject
               ? "Explore um assunto por vez."
-              : "Escolha uma matéria para abrir seu caminho."}
+              : "Escolha uma matÃ©ria para abrir seu caminho."}
           </p>
         </div>
       </div>
+
       {subject ? (
         <>
           <Link href="/mapa" className="text-link">
-            ← Todas as matérias
+            â† Todas as matÃ©rias
           </Link>
           {topics
             ?.filter((t) => t.subject_id === subject.id)
             .map((t) => {
-              const m = mastery?.find((m) => m.topic_id === t.id);
+              const m = mastery?.find((row) => row.topic_id === t.id);
               return (
                 <section className="note" key={t.id}>
                   <h2>
@@ -52,7 +55,7 @@ export default async function Knowledge({
                   </h2>
                   <p>
                     {m
-                      ? `${m.attempts} evidências de aprendizagem. Domínio é uma estimativa, não uma nota.`
+                      ? `${m.attempts} evidÃªncias de aprendizagem. DomÃ­nio Ã© uma estimativa, nÃ£o uma nota.`
                       : "Comece uma atividade para conhecer seu ponto de partida."}
                   </p>
                   {m &&
@@ -64,8 +67,8 @@ export default async function Knowledge({
                     ) <
                       m.score * 0.8 && (
                       <p className="notice">
-                        Este assunto está há algum tempo sem prática. Uma
-                        revisão curta pode ajudar a consolidar a memória.
+                        Este assunto estÃ¡ hÃ¡ algum tempo sem prÃ¡tica. Uma
+                        revisÃ£o curta pode ajudar a consolidar a memÃ³ria.
                       </p>
                     )}
                   {lessons
@@ -76,7 +79,7 @@ export default async function Knowledge({
                         href={`/aprender/${l.id}`}
                         className="row-card"
                       >
-                        {l.title} →
+                        {l.title} â†’
                       </Link>
                     ))}
                 </section>
@@ -91,7 +94,7 @@ export default async function Knowledge({
             href={`/mapa?materia=${s.slug}`}
           >
             <h2>{s.name}</h2>
-            <span>Explorar →</span>
+            <span>Explorar â†’</span>
           </Link>
         ))
       )}

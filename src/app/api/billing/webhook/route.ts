@@ -1,52 +1,104 @@
 import { createHash } from "node:crypto";
-import { createClient } from "@supabase/supabase-js";
-import { verifySignedEvent } from "@/domain/webhook";
-import { boundedText } from "@/lib/request";
+import Stripe from "stripe";
+import { adminDb } from "@/lib/admin-db";
+import {
+  planForStripePrice,
+  stripeClient,
+  type PaidPlanId,
+} from "@/lib/stripe";
+
+type StoredStatus =
+  "pending" | "active" | "past_due" | "cancelled" | "expired" | "failed";
+
+function mapStatus(status: Stripe.Subscription.Status): StoredStatus {
+  if (status === "active" || status === "trialing") return "active";
+  if (status === "past_due") return "past_due";
+  if (status === "canceled") return "cancelled";
+  if (status === "unpaid" || status === "incomplete_expired") return "failed";
+  return "pending";
+}
+
 export async function POST(request: Request) {
-  // Development contract only. A real provider adapter must be activated explicitly.
+  const stripe = stripeClient();
+  const admin = adminDb();
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripe || !admin || !secret)
+    return Response.json({ error: "Billing not configured." }, { status: 503 });
+
+  const signature = request.headers.get("stripe-signature");
+  if (!signature)
+    return Response.json({ error: "Missing signature." }, { status: 400 });
+
+  const raw = await request.text();
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(raw, signature, secret);
+  } catch {
+    return Response.json({ error: "Invalid signature." }, { status: 400 });
+  }
+
   if (
-    process.env.BILLING_PROVIDER !== "signed-development" ||
-    process.env.NODE_ENV === "production" ||
-    !process.env.BILLING_WEBHOOK_SECRET ||
-    !process.env.SUPABASE_SECRET_KEY
+    event.type !== "customer.subscription.created" &&
+    event.type !== "customer.subscription.updated" &&
+    event.type !== "customer.subscription.deleted"
   )
-    return Response.json(
-      { error: "Billing provider not configured." },
-      { status: 503 },
-    );
-  let raw: string;
-  try {
-    raw = await boundedText(request, 16000);
-  } catch {
-    return Response.json({ error: "Payload too large." }, { status: 413 });
+    return Response.json({ received: true });
+
+  const subscription = event.data.object as Stripe.Subscription;
+  const item = subscription.items.data[0];
+  const priceId = item?.price.id || "";
+  const planFromPrice = planForStripePrice(priceId);
+  const planFromMetadata = subscription.metadata.plan_id;
+  const plan: PaidPlanId | null =
+    planFromMetadata === "pro" || planFromMetadata === "premium"
+      ? planFromMetadata
+      : planFromPrice;
+
+  const customerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
+
+  let userId = subscription.metadata.nexo_user_id;
+
+  if (!userId) {
+    const customer = await stripe.customers.retrieve(customerId);
+    if (!("deleted" in customer && customer.deleted))
+      userId = (customer as Stripe.Customer).metadata.nexo_user_id;
   }
-  try {
-    const e = verifySignedEvent(
-      raw,
-      request.headers.get("x-nexo-signature") || "",
-      process.env.BILLING_WEBHOOK_SECRET,
-    );
-    const db = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SECRET_KEY,
-      { auth: { persistSession: false } },
-    );
-    const { data, error } = await db.rpc("apply_billing_event", {
-      p_id: e.id,
-      p_hash: createHash("sha256").update(raw).digest("hex"),
-      p_user: e.userId,
-      p_plan: e.plan,
-      p_status: e.status,
-      p_period_end: e.periodEnd,
-      p_created_at: e.createdAt,
-    });
-    if (error)
-      return Response.json({ error: "Event rejected." }, { status: 400 });
-    return Response.json({ status: data });
-  } catch {
-    return Response.json(
-      { error: "Invalid event or signature." },
-      { status: 400 },
-    );
-  }
+
+  if (!userId || !plan || !priceId)
+    return Response.json({ error: "Unknown subscription." }, { status: 400 });
+
+  const rawSubscription = subscription as unknown as {
+    current_period_end?: number;
+    cancel_at?: number | null;
+    items: { data: Array<{ current_period_end?: number }> };
+  };
+
+  const periodEndSeconds =
+    rawSubscription.current_period_end ||
+    rawSubscription.items.data[0]?.current_period_end ||
+    rawSubscription.cancel_at ||
+    Math.floor(Date.now() / 1000);
+
+  const { error } = await admin.rpc("apply_stripe_billing_event", {
+    p_id: event.id,
+    p_hash: createHash("sha256").update(raw).digest("hex"),
+    p_user: userId,
+    p_plan: plan,
+    p_status: mapStatus(subscription.status),
+    p_period_end: new Date(periodEndSeconds * 1000).toISOString(),
+    p_customer: customerId,
+    p_subscription: subscription.id,
+    p_price: priceId,
+    p_created_at: new Date(event.created * 1000).toISOString(),
+  });
+
+  if (error)
+    return Response.json({ error: "Event rejected." }, { status: 400 });
+
+  return Response.json({ received: true });
 }

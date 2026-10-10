@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { requireProfile } from "@/lib/supabase";
+import { getCurrentPlanAccess } from "@/lib/plan-access";
 import { Logo } from "@/components/logo";
 import { Navigation } from "@/components/navigation";
 import { logout } from "@/app/actions/auth";
 import { NotificationBell } from "@/components/notification-bell";
 import { ConnectionStatus } from "@/components/connection-status";
 import { Suspense } from "react";
-import { Bell } from "lucide-react";
+import { Bell, CreditCard } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { LanguageSelector } from "@/components/language-selector";
+
 function BellPlaceholder() {
   const t = useTranslations("notifications");
   return (
@@ -22,14 +23,18 @@ function BellPlaceholder() {
     </Link>
   );
 }
+
 export const metadata = { robots: { index: false, follow: false } };
+
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { profile } = await requireProfile();
+  const { profile, plan } = await getCurrentPlanAccess();
   const t = await getTranslations("navigation");
+  const planName = plan.name;
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -39,11 +44,24 @@ export default async function AppLayout({
             <NotificationBell />
           </Suspense>
         </div>
+
         <Navigation />
+
         <div className="sidebar-footer">
           <p>{t("motto")}</p>
           <LanguageSelector compact />
-          <Link href="/planos">{t("plans")}</Link>
+
+          <Link href="/planos" className="sidebar-plan-card">
+            <span className="sidebar-plan-icon">
+              <CreditCard size={16} />
+            </span>
+            <span>
+              <small>Seu plano</small>
+              <strong>{planName}</strong>
+            </span>
+            <b>Ã¢â€ â€™</b>
+          </Link>
+
           <form action={logout}>
             <button
               className="button small secondary"
@@ -54,6 +72,7 @@ export default async function AppLayout({
           </form>
         </div>
       </aside>
+
       <header className="mobile-header">
         <Logo />
         <div className="header-actions">
@@ -66,10 +85,12 @@ export default async function AppLayout({
           </Link>
         </div>
       </header>
+
       <main id="main" className="app-main page-enter">
         <ConnectionStatus />
         {children}
       </main>
+
       <Navigation mobile />
     </div>
   );

@@ -1,64 +1,199 @@
-import { requireProfile } from "@/lib/supabase";
-import { planSchema, featureLabels } from "@/domain/plans";
-import { getRegionalFormats } from "@/i18n/server-format";
+import { Check, CreditCard, Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-export default async function Plans() {
-  const { db } = await requireProfile();
-  const format = await getRegionalFormats();
-  const t = await getTranslations("plans");
+import { getRegionalFormats } from "@/i18n/server-format";
+import { planSchema } from "@/domain/plans";
+import { getCurrentPlanAccess } from "@/lib/plan-access";
+import { stripeBillingReady } from "@/lib/stripe";
+
+const highlights: Record<string, string[]> = {
+  free: ["saved_help", "basic_review", "daily_plan"],
+  pro: [
+    "adaptive_plan",
+    "advanced_activities",
+    "knowledge_map",
+    "spaced_repetition",
+    "topic_analytics",
+  ],
+  premium: [
+    "prove_learning",
+    "advanced_reports",
+    "knowledge_map",
+    "adaptive_plan",
+  ],
+};
+
+export default async function Plans({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    checkout?: string;
+    erro?: string;
+    gerenciar?: string;
+    recurso?: string;
+  }>;
+}) {
+  const params = await searchParams;
+  const { db, plan: currentPlan } = await getCurrentPlanAccess();
+  const [format, t] = await Promise.all([
+    getRegionalFormats(),
+    getTranslations("plans"),
+  ]);
   const { data, error } = await db
     .from("plans")
     .select("*")
     .order("daily_questions");
   if (error) throw error;
+
   const plans = planSchema.array().parse(data);
+  const billingReady = stripeBillingReady();
+
   return (
     <>
-      <div className="page-heading">
+      <div className="page-heading pricing-heading">
         <div>
-          <span className="eyebrow">{t("eyebrow")}</span>
-          <h1>{t("title")}</h1>
-          <p>{t("description")}</p>
+          <span className="eyebrow">ESCOLHA O RITMO</span>
+          <h1>Menos tabela. Mais diferenÃ§a de verdade.</h1>
+          <p>
+            O plano muda o que o NEXO libera para vocÃª. O essencial continua
+            funcionando no Free.
+          </p>
         </div>
+        <span className="current-plan-pill">
+          Seu plano: <strong>{currentPlan.name}</strong>
+        </span>
       </div>
-      <div className="subject-grid">
-        {plans.map((p) => (
-          <article className="panel" key={p.id}>
-            <span className="pill">
-              {p.id === "pro"
-                ? t("recommended")
-                : p.id === "free"
-                  ? t("available")
-                  : t("preparing")}
-            </span>
-            <h2>{p.name}</h2>
-            <p>{t(p.id + "Description")}</p>
-            <strong>
-              {format.currency(p.monthly_price_cents / 100, p.currency)} /{" "}
-              {t("month")}
-            </strong>
-            <ul>
-              {Object.entries(featureLabels)
-                .filter(([key]) => p.features[key])
-                .map(([key]) => (
-                  <li key={key}>{t("features." + key)}</li>
+
+      {params.checkout === "sucesso" && (
+        <p className="notice success">
+          Pagamento recebido. A Stripe estÃ¡ confirmando sua assinatura.
+        </p>
+      )}
+      {params.checkout === "cancelado" && (
+        <p className="notice">Tudo certo. Nenhuma assinatura foi concluÃ­da.</p>
+      )}
+      {params.recurso && (
+        <p className="notice">
+          Esse recurso faz parte de um plano superior. VocÃª pode comparar
+          abaixo.
+        </p>
+      )}
+      {params.erro && (
+        <p className="notice error">
+          NÃ£o foi possÃ­vel abrir a cobranÃ§a agora. Confira a configuraÃ§Ã£o
+          da Stripe.
+        </p>
+      )}
+
+      <div className="pricing-grid">
+        {plans.map((p) => {
+          const current = p.id === currentPlan.id;
+          const paid = p.id !== "free";
+          const hasPaidSubscription = currentPlan.id !== "free";
+
+          return (
+            <article
+              className={[
+                "pricing-card",
+                p.id === "pro" ? "featured" : "",
+                current ? "current" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              key={p.id}
+            >
+              <div className="pricing-card-top">
+                <span className="pill">
+                  {current
+                    ? "Seu plano"
+                    : p.id === "pro"
+                      ? t("recommended")
+                      : p.id === "free"
+                        ? t("available")
+                        : "Mais completo"}
+                </span>
+                {p.id === "pro" && <Sparkles size={18} />}
+              </div>
+
+              <h2>{p.name}</h2>
+              <p className="plan-description">{t(p.id + "Description")}</p>
+
+              <div className="plan-price">
+                <strong>
+                  {format.currency(p.monthly_price_cents / 100, p.currency)}
+                </strong>
+                <span>/ mÃªs</span>
+              </div>
+
+              <ul className="plan-benefits">
+                {highlights[p.id].map((key) => (
+                  <li key={key}>
+                    <Check size={17} />
+                    <span>{t(`features.${key}`)}</span>
+                  </li>
                 ))}
-            </ul>
-            <p>{t("practice", { count: p.daily_questions })}</p>
-            <p>
-              {t("simulation", {
-                count: p.weekly_simulations,
-                max: p.max_simulation,
-              })}
-            </p>
-            <p>{t("ai", { count: p.daily_ai })}</p>
-            <p className="fine-print">
-              {p.id === "free" ? t("noCharge") : t("reference")}
-            </p>
-          </article>
-        ))}
+              </ul>
+
+              <div className="plan-usage">
+                <span>
+                  {p.daily_questions.toLocaleString("pt-BR")} questÃµes/dia
+                </span>
+                <span>{p.weekly_simulations} simulados/7 dias</span>
+                <span>{p.daily_ai} ajudas do Tutor/dia</span>
+              </div>
+
+              <div className="plan-action">
+                {current ? (
+                  paid ? (
+                    <form action="/api/billing/portal" method="post">
+                      <button
+                        className="button dark full"
+                        disabled={!billingReady}
+                      >
+                        <CreditCard size={17} />
+                        Gerenciar assinatura
+                      </button>
+                    </form>
+                  ) : (
+                    <span className="button secondary full" aria-current="true">
+                      Plano atual
+                    </span>
+                  )
+                ) : paid && hasPaidSubscription ? (
+                  <form action="/api/billing/portal" method="post">
+                    <button
+                      className="button primary full"
+                      disabled={!billingReady}
+                    >
+                      Gerenciar ou trocar plano
+                    </button>
+                  </form>
+                ) : paid ? (
+                  <form action="/api/billing/checkout" method="post">
+                    <input type="hidden" name="plan" value={p.id} />
+                    <button
+                      className="button primary full"
+                      disabled={!billingReady}
+                    >
+                      Assinar {p.name}
+                    </button>
+                  </form>
+                ) : (
+                  <span className="fine-print">
+                    O Free continua disponÃ­vel sem cobranÃ§a.
+                  </span>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
-      <p className="notice">{t("notice")}</p>
+
+      {!billingReady && (
+        <p className="fine-print billing-note">
+          A interface estÃ¡ pronta. A cobranÃ§a aparece assim que as credenciais
+          e preÃ§os da Stripe forem configurados no ambiente.
+        </p>
+      )}
     </>
   );
 }

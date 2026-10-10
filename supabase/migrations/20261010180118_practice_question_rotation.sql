@@ -1,4 +1,4 @@
-﻿-- Reduce excessive repetition between practice sessions.
+-- Reduce excessive repetition between practice sessions.
 -- Non-destructive: replaces only the question-selection function.
 
 create or replace function public.next_question(p_session uuid)

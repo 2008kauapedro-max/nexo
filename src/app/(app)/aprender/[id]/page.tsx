@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { requireProfile } from "@/lib/supabase";
+import { getCurrentPlanAccess } from "@/lib/plan-access";
 import { Activity } from "@/components/activity";
 import { StartForm } from "@/components/start-form";
+
 export default async function Lesson({
   params,
 }: {
@@ -11,14 +12,17 @@ export default async function Lesson({
 }) {
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
-  const { db } = await requireProfile();
+
+  const { db, plan } = await getCurrentPlanAccess();
   const { data: l, error: lessonError } = await db
     .from("lessons")
     .select("*,topics(subject_id,name)")
     .eq("id", id)
     .maybeSingle();
+
   if (lessonError) throw lessonError;
   if (!l) notFound();
+
   const { data: activities, error } = await db
     .from("learning_activities")
     .select("*")
@@ -31,12 +35,15 @@ export default async function Lesson({
       "ORDERING",
     ])
     .order("position");
+
   if (error) throw error;
+
   const { data: feedback, error: feedbackError } = await db.rpc(
     "activity_feedback",
     { p_lesson: id },
   );
   if (feedbackError) throw feedbackError;
+
   const saved = z
     .array(
       z.object({
@@ -55,23 +62,27 @@ export default async function Lesson({
       }),
     )
     .parse(feedback);
+
   return (
     <article className="reading-container">
       <Link href="/aprender" className="text-link">
-        ← Aprender
+        â† Aprender
       </Link>
       <span className="eyebrow" style={{ marginTop: 25 }}>
         {l.topics?.name}
       </span>
       <h1>{l.title}</h1>
+
       <section className="lesson-explanation">
         <h2>Conecte a ideia.</h2>
         <p>{l.explanation}</p>
       </section>
+
       <section className="worked-example">
         <span className="eyebrow">UM EXEMPLO</span>
         <p>{l.example}</p>
       </section>
+
       {activities.map((a) => {
         const payload = z
           .object({ items: z.array(z.string().min(1).max(500)).min(2).max(10) })
@@ -90,13 +101,26 @@ export default async function Lesson({
           />
         );
       })}
+
       <section className="lesson-next">
-        <Link className="button secondary" href={`/provar/${id}`}>
-          Me prove que aprendeu →
+        <Link
+          className="button secondary"
+          href={
+            plan.features.prove_learning
+              ? `/provar/${id}`
+              : "/planos?recurso=prove_learning"
+          }
+        >
+          Me prove que aprendeu
+          {!plan.features.prove_learning && (
+            <span className="pill">Premium</span>
+          )}
+          â†’
         </Link>
         <h2>Agora, mude o contexto.</h2>
         <p>
-          Pratique com outras questões para descobrir se o conceito ficou claro.
+          Pratique com outras questÃµes para descobrir se o conceito ficou
+          claro.
         </p>
         <StartForm
           topic={l.topic_id}

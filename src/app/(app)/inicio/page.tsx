@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Flame, Target, Zap, ArrowUpRight } from "lucide-react";
 import { requireProfile } from "@/lib/supabase";
 import { levelFromXp } from "@/domain/learning";
-import { StartForm } from "@/components/start-form";
 import { getTranslations } from "next-intl/server";
 import { getRegionalFormats } from "@/i18n/server-format";
 export default async function Home() {
