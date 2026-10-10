@@ -34,15 +34,15 @@ export default async function Study() {
           {t("sos")}
         </Link>
       </nav>
-      <div className="panel">
-        <h3>{t("personalPractice")}</h3>
-        <p style={{ margin: "12px 0 20px" }}>{t("tenQuestions")}</p>
-        <StartForm />
-      </div>
       <div className="section-heading">
         <h2>{t("subjects")}</h2>
       </div>
       <Subjects subjects={data || []} />
+      <div className="panel" style={{ marginTop: 24 }}>
+        <h3>{t("personalPractice")}</h3>
+        <p style={{ margin: "12px 0 20px" }}>{t("tenQuestions")}</p>
+        <StartForm />
+      </div>
       <div className="section-heading">
         <h2>{t("workspace")}</h2>
       </div>
@@ -57,7 +57,7 @@ export default async function Study() {
           ["/buscar", "search"],
         ].map(([href, key]) => (
           <Link key={href} href={href} prefetch={false}>
-            {t(key)} →
+            {t(key)} â†’
           </Link>
         ))}
       </div>

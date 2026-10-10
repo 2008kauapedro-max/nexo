@@ -90,7 +90,9 @@ export default async function Home() {
             {t("resume")} <ArrowUpRight size={18} />
           </Link>
         ) : (
-          <StartForm />
+          <Link className="button primary" href="/estudar">
+            {t("chooseSubject")}
+          </Link>
         )}
       </section>
       <nav className="today-links" aria-label={t("otherPaths")}>
