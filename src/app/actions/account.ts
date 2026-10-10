@@ -73,6 +73,11 @@ export async function reauthenticateDeletion(
     )
   )
     return { error: t("reauthError") };
+  // The database uses its own clock and the live Auth session. A refreshed JWT
+  // alone, or a revoked session whose JWT has not expired, cannot pass this gate.
+  const readiness = await access.db.rpc("account_deletion_readiness");
+  if (readiness.error || readiness.data !== true)
+    return { error: t("reauthError") };
   return { verified: true };
 }
 // Await the separately approved DB gate; never call the older RPC from this staged flow.

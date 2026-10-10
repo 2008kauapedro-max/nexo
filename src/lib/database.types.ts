@@ -1327,6 +1327,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_deletion_readiness: { Args: never; Returns: boolean }
       activity_feedback: { Args: { p_lesson: string }; Returns: Json }
       admin_catalog: {
         Args: {

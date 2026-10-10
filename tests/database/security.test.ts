@@ -491,28 +491,30 @@ describe("database permissions with two independent identities", () => {
       false,
     );
   });
-  it("deletes only the caller and cascades private study records", async () => {
+  it("blocks the legacy deletion RPC and preserves caller and other accounts", async () => {
     const disposable = "00000000-0000-4000-8000-000000000099";
     await db.exec(`insert into auth.users values('${disposable}');`);
     await asUser(
       disposable,
       `insert into public.notes(user_id,title,body) values('${disposable}','Descartável','Teste isolado de exclusão')`,
     );
-    await asUser(disposable, "select public.delete_account()");
+    await expect(
+      asUser(disposable, "select public.delete_account()"),
+    ).rejects.toThrow(/permission denied/);
     expect(
       (await db.query(`select id from auth.users where id='${disposable}'`))
         .rows,
-    ).toHaveLength(0);
+    ).toHaveLength(1);
     expect(
       (
         await db.query(
           `select id from public.notes where user_id='${disposable}'`,
         )
       ).rows,
-    ).toHaveLength(0);
+    ).toHaveLength(1);
     expect(
       (await asUser(disposable, "select id from public.profiles")).rows,
-    ).toHaveLength(0);
+    ).toHaveLength(1);
     expect(
       (
         await db.query(
