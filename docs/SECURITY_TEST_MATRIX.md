@@ -1,5 +1,7 @@
 # Matriz de segurança — NEXO
 
+Histórico de 09/10. A atualização posterior bloqueou a RPC antiga de exclusão e validou a sessão viva; consulte [FINAL_HARDENING.md](FINAL_HARDENING.md).
+
 Checkpoint em andamento de 09/10/2026. “Bloqueado” descreve o ataque no teste indicado, não uma garantia geral. A migration isolada report_question_security_hardening foi aplicada e validada no NEXO. O pacote anterior foi retirado; delete_account remoto permanece inalterado. Controles novos da interface ainda não foram publicados.
 
 | Ataque / superfície | Defesa | Evidência / estado |

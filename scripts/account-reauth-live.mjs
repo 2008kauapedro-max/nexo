@@ -30,6 +30,7 @@ assert.equal(
   "REAUTH_REQUIRED",
 );
 passed.push("genuinely aged unexpired JWT rejected after five minutes");
+assert.equal((await db.auth.signOut({ scope: "local" })).error, null);
 const recent = await login();
 assert.notEqual(recent.access_token, session.access_token);
 assert.equal((await db.rpc("account_deletion_readiness")).data, true);

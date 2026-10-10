@@ -1,5 +1,7 @@
 # Segurança do NEXO
 
+Atualização de 10/10/2026: a RPC antiga de exclusão está bloqueada por grants no banco. Os checkpoints abaixo são históricos; estado e evidências atuais em [FINAL_HARDENING.md](FINAL_HARDENING.md).
+
 ## Fronteiras
 
 Ativos: identidade, histórico educacional, gabaritos, papéis administrativos, limites e assinatura. Atores adversários considerados: visitante, aluno autenticado manipulando UUIDs/payloads e emissor de webhook falso.

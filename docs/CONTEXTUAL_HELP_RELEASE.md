@@ -1,5 +1,7 @@
 # NEXO — ajuda contextual, 10 de outubro de 2026
 
+Checkpoint de ajuda contextual. A contenção de exclusão e a entrega posterior estão em [FINAL_HARDENING.md](FINAL_HARDENING.md).
+
 ## Escopo entregue
 
 Navegação sem chat geral; `/ia` redireciona para estudo ou para a questão indicada. Ajuda abre junto da questão, com dica e conceito antes da tentativa, solução e explicações das alternativas depois. Simulado ativo bloqueia ajuda também no banco. As 42 questões originais receberam conteúdo salvo por inserção idempotente, sem sobrescrever edição existente. Cinco perfis e 196 tentativas estavam presentes antes e depois do seed; testes E2E posteriores acrescentam tentativas QA, nunca removem as existentes.

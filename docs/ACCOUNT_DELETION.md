@@ -1,6 +1,14 @@
-# Exclusão de conta — estado em 09/10/2026
+# Exclusão de conta — atualização de 10/10/2026
 
-O SQL remoto delete_account continua na versão anterior, por instrução explícita. A solicitação destrutiva anterior foi retirada. Nenhuma nova migration de exclusão foi aplicada. O bloqueio da interface local NÃO protege chamadas diretas à RPC antiga.
+A migration `20261010170456_account_reauthentication_guard.sql` foi aplicada somente no NEXO. Revogou EXECUTE de `delete_account` e da reserva de chat geral `reserve_ai` para PUBLIC, anon, authenticated e service_role, sem mudar suas definições e sem excluir linhas. A chamada direta antiga agora é recusada; a interface continua desabilitada. Contagem imediatamente antes/depois: 5 perfis, 209 tentativas, 42 pedagogias.
+
+O novo gate privado verifica identidade, expiração JWT, sessão existente em `auth.sessions`, prazo `not_after`, conta não banida/excluída, ausência de papel administrativo e reautenticação por senha há no máximo cinco minutos. A prova precisa existir no AMR assinado e em `auth.mfa_amr_claims`; MFA exige aal2 e TOTP recente nas duas fontes. O servidor usa `account_deletion_readiness()` após senha/TOTP. Esta RPC é somente leitura e não aceita identidade fornecida pelo cliente. OAuth/OTP não são métodos habilitados para exclusão: não há login OAuth ativo no produto nem provedor/callback de reautenticação validado.
+
+O SQL de exclusão proposto está em [pending-sql/enable_account_deletion.sql](pending-sql/enable_account_deletion.sql), **fora das migrations e NÃO aplicado**. Testado somente em banco descartável em memória: confirmação exata, reautenticação, revogação prévia, cascata de registro de teste, preservação de B e recusa de repetição. Isso não substitui backup/restauração e teste destrutivo remoto autorizado. Não liberar o botão nem conceder acesso à RPC antiga. Nenhum segredo de servidor é necessário para o gate de leitura.
+
+## Histórico anterior à contenção (09/10/2026)
+
+Antes da atualização acima, a RPC antiga continuava executável diretamente. A solicitação destrutiva anterior foi retirada. A contenção agora é no banco; não apenas na interface.
 
 Interface local: Configurações → Dados → Zona de risco → aviso → reautenticação oficial Supabase → confirmação explícita. A ação final permanece indisponível até aprovação separada da nova proteção no banco. Cancelar desmonta a etapa e descarta seu estado. Administradores recebem orientação de transferência de responsabilidades; não há backdoor de exclusão.
 
@@ -21,6 +29,8 @@ Referências removidas por SET NULL: private.audit_logs.actor, private.cost_entr
 Preservados: catálogos, questões, aulas, gabaritos, atividades, planos e conquistas compartilhados. private.billing_events mantém id, payload_hash, processed_at; sem coluna direta de usuário, mas identificadores externos podem permitir associação. Logs de auditoria e custos permanecem com ator nulo.
 
 ## Aprovação e recuperação
+
+Estratégia obrigatória para a etapa pendente: snapshot/backup Supabase do NEXO com retenção e ponto de restauração confirmado; ensaio de restauração em ambiente isolado incluindo Auth e registros dependentes; conta descartável autorizada e inventário das cascatas abaixo; confirmar contagens e isolamento antes/depois. Se falhar, desabilitar a nova RPC e o botão; restaurar dados apenas a partir do backup verificado, nunca reabrir a RPC antiga. O projeto ainda não tem ensaio de restauração validado. Uma migration de definição não apaga dados ao instalar, mas habilitar esta função permite exclusão definitiva ao invocá-la.
 
 Antes de propor SQL: concluir testes de fluxo, sessões revogadas, JWT antigo, MFA, métodos suportados, A/B, repetição e falhas de rede. Apresentar SQL integral e impacto para aprovação explícita. Não executar exclusão real de usuários existentes para testar.
 

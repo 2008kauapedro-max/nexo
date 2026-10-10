@@ -6,9 +6,11 @@ Aprenda no seu nível. Plataforma de estudos adaptativos em português, com iden
 
 ## Estado da entrega
 
-Implementados: landing, autenticação por e-mail, onboarding persistente, diagnóstico, treino adaptativo, feedback, XP, sequência, revisão espaçada, simulados, resultados, perfil, exportação/exclusão de conta, administração de conteúdo, importação JSON/CSV e PWA. O seed contém 42 questões autorais, distribuídas por sete matérias.
+Implementados: landing, autenticação por e-mail, onboarding persistente, diagnóstico, treino adaptativo, feedback, XP, sequência, revisão espaçada, simulados, resultados, perfil, exportação de dados, administração de conteúdo, importação JSON/CSV e PWA. Exclusão de conta permanece desabilitada no banco e na interface; reautenticação tem verificação de sessão ativa. O seed contém 42 questões autorais, distribuídas por sete matérias.
 
 O tutor tem integração server-side e limites, mas requer credenciais para respostas reais. Planos existem no banco; checkout comercial ainda está desativado. Não existe integração de pagamento fingindo estar ativa. Consulte [VALIDATION.md](docs/VALIDATION.md) para evidência e limites.
+
+Para continuar no VS Code, comece pelo [HANDOFF.md](HANDOFF.md). O estado de segurança mais recente está em [FINAL_HARDENING.md](docs/FINAL_HARDENING.md); relatórios anteriores são históricos.
 
 ## Stack e arquitetura
 

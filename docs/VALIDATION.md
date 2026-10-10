@@ -1,5 +1,7 @@
 # Registro de validação
 
+Registro histórico. Para a entrega atual, consulte [FINAL_HARDENING.md](FINAL_HARDENING.md) e [HANDOFF.md](../HANDOFF.md).
+
 ## Checkpoint 04/10/2026
 
 - Supabase exclusivo: `jseljonjvpkurvhwqsjh`, São Paulo. Oito migrations aplicadas.
