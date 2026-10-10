@@ -74,9 +74,7 @@ O papel administrativo está em `private.admins`, nunca em metadados editáveis 
 | `NEXT_PUBLIC_SUPABASE_URL`             | Endpoint do NEXO                                                                |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave pública adequada ao cliente                                               |
 | `SUPABASE_SECRET_KEY`                  | Somente servidor; finalização de uso IA e eventos de billing                    |
-| `AI_BASE_URL`                          | Endpoint HTTPS compatível com Chat Completions                                  |
-| `AI_API_KEY`                           | Credencial privada do provedor de IA                                            |
-| `AI_MODEL`                             | Modelo contratado e disponível                                                  |
+| `GROQ_API_KEY`                         | Credencial privada Groq; modelo fixo openai/gpt-oss-20b, somente ajuda contextual |
 | `BILLING_PROVIDER`                     | `disabled` por padrão; contrato `signed-development` somente em desenvolvimento |
 | `BILLING_WEBHOOK_SECRET`               | Assinatura HMAC do contrato de desenvolvimento                                  |
 

@@ -1,6 +1,7 @@
 export type TutorResult = {
   text: string;
   tokens: number;
+  estimatedCostUsd?: number;
   provider: string;
   model: string;
 };

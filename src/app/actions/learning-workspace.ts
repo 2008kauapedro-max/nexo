@@ -2,7 +2,10 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/supabase";
-import { generateLinearQuestions } from "@/domain/question-factory";
+import {
+  generateLinearQuestions,
+  generateQuantitativeQuestions,
+} from "@/domain/question-factory";
 import type { ActionState } from "./auth";
 export async function createStudyPlan(
   _state: ActionState,
@@ -55,6 +58,7 @@ export async function createQuestionDrafts(
     .object({
       topic: z.uuid(),
       seed: z.coerce.number().int().min(1).max(10000),
+      kind: z.enum(["linear", "motion", "molar_mass"]).default("linear"),
     })
     .safeParse(Object.fromEntries(form));
   if (!p.success) return { error: "Confira o assunto e a semente de geração." };
@@ -65,12 +69,25 @@ export async function createQuestionDrafts(
     .select("id,subject_id,subjects(slug)")
     .eq("id", p.data.topic)
     .single();
-  if (!topic || topic.subjects?.slug !== "matematica")
-    return { error: "Este gerador atende somente matemática." };
-  const rows = generateLinearQuestions(topic.subject_id, topic.id, p.data.seed);
+  const expected = {
+    linear: "matematica",
+    motion: "fisica",
+    molar_mass: "quimica",
+  };
+  if (!topic || topic.subjects?.slug !== expected[p.data.kind])
+    return { error: "Escolha um assunto da matéria correspondente ao modelo." };
+  const rows =
+    p.data.kind === "linear"
+      ? generateLinearQuestions(topic.subject_id, topic.id, p.data.seed)
+      : generateQuantitativeQuestions(
+          topic.subject_id,
+          topic.id,
+          p.data.seed,
+          p.data.kind,
+        );
   let saved = 0;
   for (const row of rows) {
-    const { error } = await db.rpc("admin_upsert_question", {
+    const { error } = await db.rpc("admin_upsert_learning_question", {
       p_question: row,
     });
     if (!error) saved++;

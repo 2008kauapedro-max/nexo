@@ -122,6 +122,7 @@ test("administrative health and finance stay restricted", async ({ page }) => {
   await expect(
     page.getByText("Auditoria recente", { exact: true }),
   ).toHaveCount(0);
+  await page.context().clearCookies();
   await login(page, 2);
   await page.goto("/admin/financeiro");
   await expect(page.getByText("Receita e MRR", { exact: true })).toBeVisible();

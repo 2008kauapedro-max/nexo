@@ -17,8 +17,8 @@ test("student report reaches admin review and stays resolved after refresh", asy
   test.skip(!users.length, "Requires isolated QA accounts");
   const marker = `Auditoria QA de relato ${Date.now()}`;
   await login(page, 1);
-  await page.goto("/desafios");
-  await page.getByRole("button", { name: "Começar meu desafio →" }).click();
+  await page.goto("/estudar/matematica");
+  await page.getByRole("button", { name: "Treino rápido →" }).click();
   await expect(page).toHaveURL(/sessao/);
   await page.getByText("Reportar problema", { exact: true }).click();
   const question = await page.locator('input[name="question"]').inputValue();

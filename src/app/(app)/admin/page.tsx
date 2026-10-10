@@ -40,6 +40,13 @@ export default async function AdminPage({
         options: z.array(z.string()),
         answer: z.number(),
         explanation: z.string(),
+        hint: z.string().optional(),
+        key_concept: z.string().optional(),
+        solution_steps: z.array(z.string()).optional(),
+        option_explanations: z.array(z.string()).optional(),
+        common_mistakes: z.array(z.string()).optional(),
+        prerequisites: z.array(z.string()).optional(),
+        skills: z.array(z.string()).optional(),
       }),
     )
     .parse(response.rows);

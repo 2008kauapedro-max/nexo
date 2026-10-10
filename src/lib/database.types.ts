@@ -158,26 +158,73 @@ export type Database = {
       ai_usage: {
         Row: {
           created_at: string
+          error_code: string | null
+          estimated_cost_usd: number | null
+          expires_at: string | null
           id: string
+          intent: string | null
+          latency_ms: number | null
+          model: string | null
+          period_start: string | null
+          plan_id: string | null
+          question_id: string | null
+          request_hash: string | null
+          request_id: string | null
           status: string
           tokens: number
           user_id: string
         }
         Insert: {
           created_at?: string
+          error_code?: string | null
+          estimated_cost_usd?: number | null
+          expires_at?: string | null
           id?: string
+          intent?: string | null
+          latency_ms?: number | null
+          model?: string | null
+          period_start?: string | null
+          plan_id?: string | null
+          question_id?: string | null
+          request_hash?: string | null
+          request_id?: string | null
           status: string
           tokens?: number
           user_id: string
         }
         Update: {
           created_at?: string
+          error_code?: string | null
+          estimated_cost_usd?: number | null
+          expires_at?: string | null
           id?: string
+          intent?: string | null
+          latency_ms?: number | null
+          model?: string | null
+          period_start?: string | null
+          plan_id?: string | null
+          question_id?: string | null
+          request_hash?: string | null
+          request_id?: string | null
           status?: string
           tokens?: number
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "ai_usage_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_usage_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "ai_usage_user_id_fkey"
             columns: ["user_id"]
@@ -605,25 +652,43 @@ export type Database = {
       }
       plans: {
         Row: {
+          ai_burst_per_minute: number
+          annual_price_cents: number | null
+          currency: string
           daily_ai: number
           daily_questions: number
+          features: Json
           id: string
           max_simulation: number
+          monthly_price_cents: number | null
           name: string
+          weekly_simulations: number
         }
         Insert: {
+          ai_burst_per_minute?: number
+          annual_price_cents?: number | null
+          currency?: string
           daily_ai: number
           daily_questions: number
+          features?: Json
           id: string
           max_simulation: number
+          monthly_price_cents?: number | null
           name: string
+          weekly_simulations?: number
         }
         Update: {
+          ai_burst_per_minute?: number
+          annual_price_cents?: number | null
+          currency?: string
           daily_ai?: number
           daily_questions?: number
+          features?: Json
           id?: string
           max_simulation?: number
+          monthly_price_cents?: number | null
           name?: string
+          weekly_simulations?: number
         }
         Relationships: []
       }
@@ -1272,6 +1337,10 @@ export type Database = {
         }
         Returns: string
       }
+      admin_configure_plan: {
+        Args: { p_config: Json; p_id: string }
+        Returns: undefined
+      }
       admin_finance: { Args: never; Returns: Json }
       admin_health: { Args: never; Returns: Json }
       admin_quality: { Args: never; Returns: Json }
@@ -1295,6 +1364,15 @@ export type Database = {
         Returns: undefined
       }
       admin_role: { Args: never; Returns: string }
+      admin_save_pedagogy: {
+        Args: { p_content: Json; p_question: string }
+        Returns: undefined
+      }
+      admin_tutor_metrics: { Args: never; Returns: Json }
+      admin_upsert_learning_question: {
+        Args: { p_id?: string; p_question: Json }
+        Returns: string
+      }
       admin_upsert_question: {
         Args: { p_id?: string; p_question: Json }
         Returns: string
@@ -1328,14 +1406,42 @@ export type Database = {
         }
         Returns: undefined
       }
+      finish_contextual_help: {
+        Args: {
+          p_answer: string
+          p_cost?: number
+          p_error?: string
+          p_latency: number
+          p_success: boolean
+          p_tokens: number
+          p_usage: string
+          p_user: string
+        }
+        Returns: boolean
+      }
       generate_study_plan: { Args: never; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       next_question: { Args: { p_session: string }; Returns: Json }
+      question_help: {
+        Args: { p_question: string; p_session: string }
+        Returns: Json
+      }
       report_question: {
         Args: { p_detail: string; p_question: string; p_reason: string }
         Returns: undefined
       }
       reserve_ai: { Args: never; Returns: string }
+      reserve_contextual_help: {
+        Args: {
+          p_hash: string
+          p_intent: string
+          p_question: string
+          p_request: string
+          p_session: string
+          p_user: string
+        }
+        Returns: Json
+      }
       review_flashcard: {
         Args: { p_id: string; p_remembered: boolean }
         Returns: undefined

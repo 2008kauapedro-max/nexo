@@ -54,6 +54,7 @@ export default async function Session({
         answered={restored.answered}
         target={s.target}
         mode={s.mode}
+        allowHelp={s.mode !== "simulation" || s.finished_at !== null}
         initialSelected={restored.selected}
         initialFeedback={restored.feedback}
       />

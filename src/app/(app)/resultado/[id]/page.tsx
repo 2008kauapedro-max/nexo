@@ -1,3 +1,4 @@
+import { QuestionHelp } from "@/components/question-help";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
@@ -72,7 +73,9 @@ export default async function Result({
         </div>
         <div className="stat">
           <span>{t("time")}</span>
-          <strong>{study("minutes", {count: Math.ceil(seconds / 60)})}</strong>
+          <strong>
+            {study("minutes", { count: Math.ceil(seconds / 60) })}
+          </strong>
         </div>
         <div className="stat">
           <span>{t("review")}</span>
@@ -114,12 +117,7 @@ export default async function Result({
                 </p>
               )}
             </div>
-            <Link
-              className="button small secondary"
-              href={`/ia?questao=${a.question_id}&sessao=${s.id}`}
-            >
-              {t("understand")}
-            </Link>
+            <QuestionHelp question={a.question_id} session={s.id} />
           </div>
         ))}
       </div>

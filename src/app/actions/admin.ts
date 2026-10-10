@@ -38,7 +38,9 @@ export async function importQuestions(
   let saved = 0;
   const errors: string[] = [];
   for (const [index, q] of rows.data.entries()) {
-    const { error } = await db.rpc("admin_upsert_question", { p_question: q });
+    const { error } = await db.rpc("admin_upsert_learning_question", {
+      p_question: q,
+    });
     if (error)
       errors.push(
         `Linha ${index + 1}: ${error.code === "23505" ? "questão duplicada" : "dados ou referências inválidas"}`,
@@ -67,6 +69,25 @@ export async function saveQuestion(
       .filter(Boolean),
     answer: Number(form.get("answer")),
     explanation: form.get("explanation"),
+    hint: form.get("hint") || undefined,
+    key_concept: form.get("key_concept") || undefined,
+    ...Object.fromEntries(
+      [
+        "solution_steps",
+        "common_mistakes",
+        "option_explanations",
+        "prerequisites",
+        "skills",
+      ].map((key) => [
+        key,
+        form.get(key)
+          ? String(form.get(key))
+              .split("\n")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : undefined,
+      ]),
+    ),
     difficulty: Number(form.get("difficulty")),
     status: form.get("status"),
   });
@@ -74,7 +95,7 @@ export async function saveQuestion(
     return { error: parsed.error.issues.map((i) => i.message).join(" · ") };
   const id = String(form.get("id") || "");
   if (id && !z.uuid().safeParse(id).success) return { error: "ID inválido." };
-  const { error } = await db.rpc("admin_upsert_question", {
+  const { error } = await db.rpc("admin_upsert_learning_question", {
     p_question: parsed.data,
     p_id: id || undefined,
   });

@@ -18,15 +18,15 @@ Templates em `supabase/templates`: confirmação, recuperação e convite, com `
 
 Confirmação de e-mail permanece habilitada remotamente. Não desativá-la para contornar ausência de SMTP. O remetente padrão de desenvolvimento é limitado e não valida envio público. Antes de liberar: testar nova conta com caixa de entrada controlada, link único/expirado, troca de dispositivo, recuperação, nova senha, revogação e limites. Nenhuma entrega real foi confirmada nesta rodada.
 
-## IA compatível e fallback
+## Groq contextual
 
 Destino exclusivo: projeto Vercel NEXO → Settings → Environment Variables.
 
-Configurar `AI_BASE_URL` (HTTPS do endpoint compatível com Chat Completions, incluindo versão), `AI_MODEL` (identificador real contratado), `AI_API_KEY` (segredo), e `SUPABASE_SECRET_KEY` do NEXO (somente servidor para finalizar consumo). Groq ou outro fornecedor compatível pode ser configurado sem alterar a interface de domínio. Nenhum fornecedor é presumido ou contratado pelo código.
+Configurar `GROQ_API_KEY` e `SUPABASE_SECRET_KEY` do NEXO, ambas somente no servidor. A chave Supabase permite reservar/finalizar cotas em RPCs exclusivas de service_role. Não usar a chave pública nessa função. Nenhuma chave do FIO pode ser reutilizada. Endpoint e modelo já estão definidos no código: `https://api.groq.com/openai/v1`, exclusivamente `openai/gpt-oss-20b`. Não são necessárias AI_BASE_URL nem AI_MODEL. Depois de provisionada a credencial interna do NEXO, a única credencial externa da IA é GROQ_API_KEY.
 
-Fallback opcional: `AI_FALLBACK_BASE_URL`, `AI_FALLBACK_MODEL`, `AI_FALLBACK_API_KEY`. Somente provedores completamente configurados são utilizados; a primeira falha encaminha ao segundo. Cada tentativa tem timeout de 18 segundos, limite de saída e validação do formato. Sem chave não há texto simulado: a API retorna indisponibilidade e os controles de envio ficam desativados na interface. Mocks existem apenas nos testes unitários.
+Não há fallback para outro modelo, Browser Search ou Code Execution. A abstração de provider permanece, mas a configuração ativa admite só Groq/20b. Timeout de 18 segundos, 900 tokens de saída, 300 caracteres de observação, uma questão por pedido. Sem chaves, a API informa indisponibilidade e não consome cota. Dicas, conceitos, soluções, alternativas e estudo continuam disponíveis. Mocks existem somente nos testes. Cotas diárias 5/20/50 e proteção de concorrência/burst são verificadas no banco; reserva com falha é devolvida ou expira em dois minutos.
 
-Após salvar, criar novo deployment. Testar: pergunta contextual, dica sem gabarito, tentativa de prompt injection, recusa educacional, contexto de outro usuário, quota, indisponibilidade, latência, tokens e custo real. A política educacional no prompt não deve ser considerada uma barreira infalível; requer avaliação com o modelo escolhido. Custo monetário não é calculado sem tarifa confirmada. O router atualmente retorna provider/model, mas a persistência de métricas por fornecedor ainda deve ser ampliada.
+Após salvar, criar novo deployment. Testar respostas reais, dica sem gabarito, prompt injection, recusa educacional, contexto de outro usuário, cota, indisponibilidade, latência e uso real. A política educacional do prompt requer avaliação com o modelo real; não é barreira infalível. Métricas administrativas registram status, tokens, latência e custo estimado quando o provider fornece o uso: US$ 0,075/milhão de tokens de entrada e US$ 0,30/milhão de saída, conforme [modelo Groq](https://console.groq.com/docs/model/openai/gpt-oss-20b). Estimativa não substitui a fatura. Ainda não há resposta real validada sem credenciais.
 
 ## Cobrança
 

@@ -26,6 +26,20 @@ beforeAll(async () => {
   for (const file of readdirSync("supabase/migrations").sort())
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   await db.exec(
+    readFileSync(
+      "supabase/migrations/20261009230423_contextual_learning_and_plan_catalog.sql",
+      "utf8",
+    ),
+  );
+  // Replay the incremental correction after its predecessor, twice to verify idempotency.
+  for (let n = 0; n < 2; n++)
+    await db.exec(
+      readFileSync(
+        "supabase/migrations/20261010113954_contextual_quota_calendar_reset.sql",
+        "utf8",
+      ),
+    );
+  await db.exec(
     `insert into auth.users values('${alice}'),('${bob}'); insert into public.subjects(id,name,slug) values('${subject}','Matemática','matematica'); insert into public.topics(id,subject_id,name) values('${topic}','${subject}','Álgebra'); insert into public.questions(id,subject_id,topic_id,statement,options,difficulty,status,fingerprint) values('${question}','${subject}','${topic}','Quanto vale 2 + 2?','["3","4"]',5,'published','test'); insert into private.question_answers values('${question}',1,'Dois mais dois são quatro.');`,
   );
 }, 30000);
@@ -330,6 +344,10 @@ describe("database permissions with two independent identities", () => {
       alice,
       `select public.save_preferences('Alice','ENEM',array['${subject}'::uuid],'intermediate',10)`,
     );
+    await asUser(
+      alice,
+      `select public.start_session('simulation',null,null,180,30)`,
+    );
     await expect(
       asUser(
         alice,
@@ -529,7 +547,9 @@ describe("database permissions with two independent identities", () => {
     await db.exec(`delete from public.subscriptions where user_id='${bob}'`);
   });
   it("restores the visible question without advancing or leaking answers", async () => {
-    await db.exec(`delete from public.usage_counters where user_id='${alice}'`);
+    await db.exec(
+      `update public.learning_sessions set started_at=now()-interval '8 days' where user_id='${alice}' and mode='simulation'; update public.usage_counters set questions=0 where user_id='${alice}'`,
+    );
     for (const mode of ["practice", "simulation"]) {
       const sid = (
         await asUser(
@@ -636,4 +656,147 @@ describe("database permissions with two independent identities", () => {
       "delete from public.questions where fingerprint='translation-test'",
     );
   });
+});
+
+describe("contextual help quotas and answer boundaries", () => {
+  it("renews at the next local midnight even when the student returns late in the day", async () => {
+    const uid = "00000000-0000-4000-8000-000000000095",
+      sid = "60000000-0000-4000-8000-000000000095";
+    await db.exec(`insert into auth.users values('${uid}');
+      update public.profiles set time_zone=(select name from pg_catalog.pg_timezone_names where extract(hour from now() at time zone name) between 10 and 16 limit 1) where id='${uid}';
+      insert into public.learning_sessions(id,user_id,mode,target,current_question_id) values('${sid}','${uid}','practice',5,'${question}');
+      insert into private.ai_periods(user_id,starts_at,ends_at,time_zone) select id,((now() at time zone time_zone)::date-1)::timestamp at time zone time_zone,((now() at time zone time_zone)::date)::timestamp at time zone time_zone,time_zone from public.profiles where id='${uid}';
+      select public.reserve_contextual_help('${uid}','${question}','${sid}',gen_random_uuid(),'hint',repeat('a',64));`);
+    const result = await db.query<{ correct: boolean }>(
+      `select ends_at=(((now() at time zone time_zone)::date+1)::timestamp at time zone time_zone) as correct from private.ai_periods where user_id='${uid}'`,
+    );
+    expect(result.rows[0].correct).toBe(true);
+  });
+  it("keeps pedagogy private until an owned attempt, denies active exams and other users", async () => {
+    const uid = "00000000-0000-4000-8000-000000000091",
+      sid = "60000000-0000-4000-8000-000000000091";
+    await db.exec(
+      `insert into auth.users values('${uid}');insert into public.learning_sessions(id,user_id,mode,target,current_question_id) values('${sid}','${uid}','practice',5,'${question}');insert into private.question_pedagogy(question_id,hint,key_concept,solution_steps,option_explanations) values('${question}','Reúna as duas quantidades.','Adição','["2 + 2 = 4"]','["Faltou uma unidade.","Correta: quatro unidades."]');`,
+    );
+    const read = () =>
+      asUser(
+        uid,
+        `select public.question_help('${question}','${sid}') as help`,
+      );
+    const before = (await read()).rows[0] as {
+      help: { answer: number | null; solution_steps: string[]; hint: string };
+    };
+    expect(before.help.answer).toBeNull();
+    expect(before.help.solution_steps).toEqual([]);
+    expect(before.help.hint).toContain("Reúna");
+    await expect(
+      asUser(bob, `select public.question_help('${question}','${sid}')`),
+    ).rejects.toThrow(/FORBIDDEN/);
+    await expect(
+      asUser(uid, "select * from private.question_pedagogy"),
+    ).rejects.toThrow(/permission denied/);
+    await db.exec(
+      `update public.learning_sessions set mode='simulation' where id='${sid}'`,
+    );
+    await expect(read()).rejects.toThrow(/FORBIDDEN/);
+    await db.exec(
+      `update public.learning_sessions set mode='practice' where id='${sid}';insert into public.question_attempts(user_id,session_id,question_id,selected,correct,seconds,hint_used,xp) values('${uid}','${sid}','${question}',0,false,30,true,3)`,
+    );
+    const after = (await read()).rows[0] as {
+      help: { answer: number; solution_steps: string[] };
+    };
+    expect(after.help.answer).toBe(1);
+    expect(after.help.solution_steps).toHaveLength(1);
+    await expect(
+      asUser(uid, `select public.admin_configure_plan('free','{}')`),
+    ).rejects.toThrow(/FORBIDDEN/);
+  });
+  for (const [index, plan, limit] of [
+    [92, "free", 5],
+    [93, "pro", 20],
+    [94, "premium", 50],
+  ] as const) {
+    it(`enforces ${plan} ${limit}/${limit}, refunds failure, reuses requests, serializes last slot and resets safely`, async () => {
+      const uid = "00000000-0000-4000-8000-0000000000" + index,
+        sid = "60000000-0000-4000-8000-0000000000" + index;
+      await db.exec(
+        `insert into auth.users values('${uid}');insert into public.learning_sessions(id,user_id,mode,target,current_question_id) values('${sid}','${uid}','practice',5,'${question}');`,
+      );
+      if (plan !== "free")
+        await db.exec(
+          `insert into public.subscriptions(user_id,plan_id,status,period_end) values('${uid}','${plan}','active',now()+interval '1 day')`,
+        );
+      const reserve = async (request = "gen_random_uuid()") =>
+        (
+          await db.query<{
+            r: { id: string; reused: boolean; status: string; text?: string };
+          }>(
+            `select public.reserve_contextual_help('${uid}','${question}','${sid}',${request},'hint',repeat('a',64)) as r`,
+          )
+        ).rows[0].r;
+      const finish = (id: string, success: boolean) =>
+        db.query(
+          `select public.finish_contextual_help('${uid}','${id}',${success},'Uma dica curta.',10,50,'test_failure')`,
+        );
+      await expect(
+        asUser(
+          uid,
+          `select public.reserve_contextual_help('${uid}','${question}','${sid}',gen_random_uuid(),'hint',repeat('a',64))`,
+        ),
+      ).rejects.toThrow(/permission denied/);
+      const failed = await reserve();
+      await finish(failed.id, false);
+      for (let n = 0; n < limit - 1; n++) {
+        await db.exec(
+          `update public.ai_usage set created_at=now()-interval '2 minutes' where user_id='${uid}'`,
+        );
+        const r = await reserve();
+        await finish(r.id, true);
+        await finish(r.id, true);
+      }
+      await db.exec(
+        `update public.ai_usage set created_at=now()-interval '2 minutes' where user_id='${uid}'`,
+      );
+      const candidates = await Promise.allSettled(
+        Array.from({ length: 10 }, () => reserve()),
+      );
+      expect(candidates.filter((r) => r.status === "fulfilled")).toHaveLength(
+        1,
+      );
+      const winner = candidates.find(
+        (r) => r.status === "fulfilled",
+      ) as PromiseFulfilledResult<{ id: string }>;
+      await finish(winner.value.id, true);
+      await expect(reserve()).rejects.toThrow(/DAILY_LIMIT/);
+      const req = (
+        await db.query<{ request_id: string }>(
+          `select request_id from public.ai_usage where id='${winner.value.id}'`,
+        )
+      ).rows[0].request_id;
+      const repeated = await reserve(`'${req}'`);
+      expect(repeated.reused).toBe(true);
+      expect(repeated.text).toBe("Uma dica curta.");
+      const counts = (
+        await db.query<{ n: number }>(
+          `select count(*)::int n from public.ai_usage where user_id='${uid}' and status='success'`,
+        )
+      ).rows[0];
+      expect(counts.n).toBe(limit);
+      await db.exec(
+        `update public.profiles set time_zone='Pacific/Auckland' where id='${uid}'`,
+      );
+      await expect(reserve()).rejects.toThrow(/DAILY_LIMIT/);
+      await db.exec(
+        `update private.ai_periods set starts_at=now()-interval '2 days',ends_at=now()-interval '1 day' where user_id='${uid}';update public.ai_usage set created_at=now()-interval '2 minutes' where user_id='${uid}'`,
+      );
+      const reset = await reserve();
+      expect(reset.status).toBe("reserved");
+      await db.exec(
+        `update public.ai_usage set expires_at=now()-interval '1 second' where id='${reset.id}'`,
+      );
+      const recovered = await reserve();
+      expect(recovered.status).toBe("reserved");
+      await finish(recovered.id, false);
+    }, 30000);
+  }
 });

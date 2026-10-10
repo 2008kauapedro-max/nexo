@@ -135,7 +135,12 @@ test("account language overrides a visitor cookie after sign in and persists aft
     await page.getByRole("button", { name: "Abmelden", exact: true }).click();
     await expect(page).toHaveURL(/entrar/);
     await context.addCookies([
-      { name: "nexo-locale", value: "ja", domain: "localhost", path: "/" },
+      {
+        name: "nexo-locale",
+        value: "ja",
+        domain: new URL(page.url()).hostname,
+        path: "/",
+      },
     ]);
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("lang", "ja");
@@ -145,6 +150,12 @@ test("account language overrides a visitor cookie after sign in and persists aft
     await expect(page).toHaveURL(/inicio$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
   } finally {
+    if (page.url().includes("/entrar")) {
+      await page.locator("input[name=email]").fill(users[1].email);
+      await page.locator("input[name=password]").fill(users[1].password);
+      await page.locator("form button").first().click();
+      await expect(page).toHaveURL(/inicio$/);
+    }
     await page
       .locator(".language-selector:visible select")
       .first()

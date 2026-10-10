@@ -84,8 +84,8 @@ test("question survives refresh and failed request then accepts retry once", asy
   test.skip(!users.length, "Requires isolated QA accounts");
   test.setTimeout(90000);
   await login(page);
-  await page.goto("/desafios");
-  await page.getByRole("button", { name: "Começar meu desafio →" }).click();
+  await page.goto("/estudar/matematica");
+  await page.getByRole("button", { name: "Treino rápido →" }).click();
   await expect(page).toHaveURL(/sessao/);
   const question = await page.locator("h1").innerText();
   const address = page.url();

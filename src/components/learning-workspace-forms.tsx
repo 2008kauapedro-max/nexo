@@ -92,13 +92,21 @@ export function FactoryForm({
   return (
     <form action={action} className="form-stack">
       <label>
-        Assunto de matemática
+        Assunto correspondente ao modelo
         <select name="topic" required>
           {topics.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}
             </option>
           ))}
+        </select>
+      </label>
+      <label>
+        Modelo
+        <select name="kind">
+          <option value="linear">Matemática · equação linear</option>
+          <option value="motion">Física · movimento uniforme</option>
+          <option value="molar_mass">Química · massa molar</option>
         </select>
       </label>
       <label>
@@ -114,7 +122,7 @@ export function FactoryForm({
       </label>
       <p>
         A mesma semente produz o mesmo lote. Cada alternativa é validada por
-        substituição na equação. A publicação continua sendo uma decisão
+        cálculo e unicidade do gabarito. A publicação continua sendo uma decisão
         editorial.
       </p>
       {state.error && (

@@ -26,9 +26,9 @@ export function SimulationForm({
         <select name="target">
           <option value="5">5 questões</option>
           <option value="10">10 questões</option>
-          <option value="30">30 questões · Pro</option>
-          <option value="90">90 questões · Pro</option>
-          <option value="180">180 questões · Premium</option>
+          <option value="30">30 questões</option>
+          <option value="90">90 questões</option>
+          <option value="180">180 questões</option>
         </select>
       </label>
       <label>
@@ -42,7 +42,7 @@ export function SimulationForm({
       </label>
       <p className="notice">
         No modo prova, o resultado e as explicações aparecem ao terminar. O
-        tempo é controlado pelo servidor.
+        tempo é controlado pelo servidor. Cada prova iniciada conta no limite de simulados dos últimos 7 dias, mesmo se você sair antes do fim.
       </p>
       {state.error && (
         <p role="alert" className="notice error">

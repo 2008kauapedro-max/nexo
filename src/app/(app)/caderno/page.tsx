@@ -1,3 +1,4 @@
+import { QuestionHelp } from "@/components/question-help";
 import Link from "next/link";
 import { requireProfile } from "@/lib/supabase";
 import { ErrorAnnotation } from "@/components/workspace-forms";
@@ -78,12 +79,7 @@ export default async function ErrorBook({
                     resolved={n?.resolved}
                   />
                 </details>
-                <Link
-                  className="text-link"
-                  href={`/ia?questao=${a.question_id}&sessao=${a.session_id}`}
-                >
-                  Pensar com o tutor
-                </Link>
+                <QuestionHelp question={a.question_id} session={a.session_id} />
               </article>
             );
           })}

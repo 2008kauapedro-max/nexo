@@ -1,3 +1,6 @@
+import { PlanSettings } from "@/components/plan-settings";
+import { TutorMetrics } from "@/components/tutor-metrics";
+import { planSchema } from "@/domain/plans";
 import { getRegionalFormats } from "@/i18n/server-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,6 +29,12 @@ export default async function Finance() {
   const { data, error } = await db.rpc("admin_finance");
   if (error) throw error;
   const report = schema.parse(data);
+  const { data: catalog, error: catalogError } = await db
+    .from("plans")
+    .select("*")
+    .order("daily_questions");
+  if (catalogError) throw catalogError;
+  const plans = planSchema.array().parse(catalog);
   return (
     <>
       <div className="page-heading">
@@ -50,6 +59,11 @@ export default async function Finance() {
         <h2>Custos registrados</h2>
       </div>
       <CostForm />
+      <TutorMetrics />
+      <h2>Planos e limites</h2>
+      {plans.map((plan) => (
+        <PlanSettings key={plan.id} plan={plan} />
+      ))}
       {report.costs.length ? (
         <div className="table-scroll">
           <table>

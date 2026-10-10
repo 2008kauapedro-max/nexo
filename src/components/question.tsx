@@ -1,7 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
-import Link from "next/link";
-import { CheckCircle2, XCircle, Sparkles, ArrowRight } from "lucide-react";
+import { QuestionHelp } from "./question-help";
+import { CheckCircle2, XCircle, ArrowRight } from "lucide-react";
 import { answerQuestion, advanceStudy } from "@/app/actions/study";
 import { QuestionReport } from "@/components/workspace-forms";
 import { useTranslations } from "next-intl";
@@ -17,6 +17,7 @@ export function Question({
   answered,
   target,
   mode,
+  allowHelp = mode !== "simulation",
   initialSelected = null,
   initialFeedback = null,
 }: {
@@ -30,6 +31,7 @@ export function Question({
   answered: number;
   target: number;
   mode: string;
+  allowHelp?: boolean;
   initialSelected?: number | null;
   initialFeedback?: Feedback | null;
 }) {
@@ -133,13 +135,13 @@ export function Question({
         </div>
       )}
       <div className="question-actions">
-        {mode !== "simulation" && (
-          <Link
-            href={`/ia?questao=${question.id}&sessao=${sessionId}`}
-            className="button secondary"
-          >
-            <Sparkles size={17} /> {feedback ? t("understand") : t("hint")}
-          </Link>
+        {allowHelp && (
+          <QuestionHelp
+            key={question.id + String(!!feedback)}
+            question={question.id}
+            session={sessionId}
+            label={feedback ? t("understand") : t("hint")}
+          />
         )}
         {!feedback ? (
           <button

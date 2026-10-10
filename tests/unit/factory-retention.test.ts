@@ -1,5 +1,8 @@
 import { it, expect } from "vitest";
-import { generateLinearQuestions } from "../../src/domain/question-factory";
+import {
+  generateLinearQuestions,
+  generateQuantitativeQuestions,
+} from "../../src/domain/question-factory";
 import { retentionEstimate } from "../../src/domain/retention";
 it("generates reproducible drafts with one mathematically correct alternative", () => {
   const id = "10000000-0000-4000-8000-000000000001";
@@ -25,4 +28,24 @@ it("review estimate decays gradually without changing measured mastery", () => {
     80,
   );
   expect(retentionEstimate(80, date, new Date("2026-09-01"), 5)).toBe(80);
+});
+it("validates physics and chemistry templates with saved pedagogy and reproducible seeds", () => {
+  const id = "10000000-0000-4000-8000-000000000001";
+  for (const kind of ["motion", "molar_mass"] as const)
+    for (let seed = 1; seed <= 200; seed++) {
+      const batch = generateQuantitativeQuestions(id, id, seed, kind);
+      expect(batch).toEqual(generateQuantitativeQuestions(id, id, seed, kind));
+      expect(new Set(batch.map((q) => q.statement)).size).toBe(batch.length);
+      for (const q of batch) {
+        const numbers = q.statement.match(/\d+/g)!.map(Number);
+        const first = numbers[0],
+          factor = kind === "motion" ? numbers[1] : numbers.at(-1)!;
+        expect(Number(q.options[q.answer])).toBe(first * factor);
+        expect(new Set(q.options).size).toBe(4);
+        expect(q.option_explanations).toHaveLength(4);
+        expect(q.solution_steps).toHaveLength(3);
+        expect(q.hint!.length).toBeGreaterThan(10);
+        expect(q.generator_seed).toBe(seed);
+      }
+    }
 });

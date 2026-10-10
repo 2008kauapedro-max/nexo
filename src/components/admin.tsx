@@ -16,6 +16,13 @@ type Row = {
   options: string[];
   answer: number;
   explanation: string;
+  hint?: string;
+  key_concept?: string;
+  solution_steps?: string[];
+  common_mistakes?: string[];
+  option_explanations?: string[];
+  prerequisites?: string[];
+  skills?: string[];
 };
 export function Admin({
   subjects,
@@ -210,6 +217,48 @@ export function Admin({
               defaultValue={editing?.explanation}
             />
           </label>
+          <label>
+            Dica salva (sem revelar a resposta)
+            <textarea
+              name="hint"
+              minLength={10}
+              maxLength={1500}
+              defaultValue={editing?.hint}
+            />
+          </label>
+          <label>
+            Conceito principal
+            <textarea
+              name="key_concept"
+              minLength={3}
+              maxLength={1500}
+              defaultValue={editing?.key_concept}
+            />
+          </label>
+          {(
+            [
+              ["solution_steps", "Passo a passo"],
+              [
+                "option_explanations",
+                "Explicações das alternativas, na mesma ordem",
+              ],
+              ["common_mistakes", "Erros comuns"],
+              ["prerequisites", "Pré-requisitos"],
+              ["skills", "Habilidades"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key}>
+              {label} (uma entrada por linha)
+              <textarea
+                name={key}
+                maxLength={12000}
+                defaultValue={editing?.[key]?.join("\n")}
+              />
+            </label>
+          ))}
+          <p className="fine-print">
+            Para publicar conteúdo novo, cadastre dica e conceito revisados.
+          </p>
           <label>
             Dificuldade (1–10)
             <input
