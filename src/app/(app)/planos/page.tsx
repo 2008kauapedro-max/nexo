@@ -52,9 +52,9 @@ export default async function Plans({
       <div className="page-heading pricing-heading">
         <div>
           <span className="eyebrow">ESCOLHA O RITMO</span>
-          <h1>Menos tabela. Mais diferenÃ§a de verdade.</h1>
+          <h1>Menos tabela. Mais diferença de verdade.</h1>
           <p>
-            O plano muda o que o NEXO libera para vocÃª. O essencial continua
+            O plano muda o que o NEXO libera para você. O essencial continua
             funcionando no Free.
           </p>
         </div>
@@ -65,22 +65,22 @@ export default async function Plans({
 
       {params.checkout === "sucesso" && (
         <p className="notice success">
-          Pagamento recebido. A Stripe estÃ¡ confirmando sua assinatura.
+          Pagamento recebido. A Stripe está confirmando sua assinatura.
         </p>
       )}
       {params.checkout === "cancelado" && (
-        <p className="notice">Tudo certo. Nenhuma assinatura foi concluÃ­da.</p>
+        <p className="notice">Tudo certo. Nenhuma assinatura foi concluída.</p>
       )}
       {params.recurso && (
         <p className="notice">
-          Esse recurso faz parte de um plano superior. VocÃª pode comparar
+          Esse recurso faz parte de um plano superior. Você pode comparar
           abaixo.
         </p>
       )}
       {params.erro && (
         <p className="notice error">
-          NÃ£o foi possÃ­vel abrir a cobranÃ§a agora. Confira a configuraÃ§Ã£o
-          da Stripe.
+          Não foi possível abrir a cobrança agora. Confira a configuração da
+          Stripe.
         </p>
       )}
 
@@ -121,7 +121,7 @@ export default async function Plans({
                 <strong>
                   {format.currency(p.monthly_price_cents / 100, p.currency)}
                 </strong>
-                <span>/ mÃªs</span>
+                <span>/ mês</span>
               </div>
 
               <ul className="plan-benefits">
@@ -135,7 +135,7 @@ export default async function Plans({
 
               <div className="plan-usage">
                 <span>
-                  {p.daily_questions.toLocaleString("pt-BR")} questÃµes/dia
+                  {p.daily_questions.toLocaleString("pt-BR")} questões/dia
                 </span>
                 <span>{p.weekly_simulations} simulados/7 dias</span>
                 <span>{p.daily_ai} ajudas do Tutor/dia</span>
@@ -179,7 +179,7 @@ export default async function Plans({
                   </form>
                 ) : (
                   <span className="fine-print">
-                    O Free continua disponÃ­vel sem cobranÃ§a.
+                    O Free continua disponível sem cobrança.
                   </span>
                 )}
               </div>
@@ -190,8 +190,8 @@ export default async function Plans({
 
       {!billingReady && (
         <p className="fine-print billing-note">
-          A interface estÃ¡ pronta. A cobranÃ§a aparece assim que as credenciais
-          e preÃ§os da Stripe forem configurados no ambiente.
+          A interface está pronta. A cobrança aparece assim que as credenciais e
+          preços da Stripe forem configurados no ambiente.
         </p>
       )}
     </>

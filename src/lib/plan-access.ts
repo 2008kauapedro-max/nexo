@@ -24,7 +24,7 @@ export async function getCurrentPlanAccess() {
     .single();
 
   if (error)
-    throw new Error("NÃ£o foi possÃ­vel carregar seu plano. Tente novamente.");
+    throw new Error("Não foi possível carregar seu plano. Tente novamente.");
 
   return {
     db,

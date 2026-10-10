@@ -24,13 +24,13 @@ export default async function Plan() {
       <div className="page-heading">
         <div>
           <span className="eyebrow">
-            {adaptive ? "PRO Â· PLANO ADAPTATIVO" : "PLANO DIÃRIO"}
+            {adaptive ? "PRO · PLANO ADAPTATIVO" : "PLANO DIÁRIO"}
           </span>
           <h1>Seu plano de estudos.</h1>
           <p>
             {adaptive
-              ? "O NEXO prioriza automaticamente os assuntos que mais precisam de atenÃ§Ã£o."
-              : "Organize sete dias de estudo. No Pro, a ordem passa a usar seu domÃ­nio por assunto."}
+              ? "O NEXO prioriza automaticamente os assuntos que mais precisam de atenção."
+              : "Organize sete dias de estudo. No Pro, a ordem passa a usar seu domínio por assunto."}
           </p>
         </div>
         {!adaptive && (
@@ -43,8 +43,8 @@ export default async function Plan() {
       <details className="panel" open={!data.length}>
         <summary>Organizar minha semana</summary>
         <p>
-          As sugestÃµes jÃ¡ salvas sÃ£o preservadas. Ajuste suas matÃ©rias nas
-          preferÃªncias para os prÃ³ximos dias adicionados.
+          As sugestões já salvas são preservadas. Ajuste suas matérias nas
+          preferências para os próximos dias adicionados.
         </p>
         <PlanForm />
       </details>
@@ -59,15 +59,15 @@ export default async function Plan() {
                 month: "2-digit",
                 timeZone: "America/Sao_Paulo",
               })}{" "}
-              Â· {item.day === today ? "HOJE" : "PLANEJADO"}
+              · {item.day === today ? "HOJE" : "PLANEJADO"}
             </span>
             <h2>{item.topics?.name}</h2>
             <p>
               {item.kind === "learn"
                 ? "Entender o conceito"
                 : item.kind === "review"
-                  ? "Revisar o que precisa de atenÃ§Ã£o"
-                  : `Praticar atÃ© ${item.target} questÃµes`}
+                  ? "Revisar o que precisa de atenção"
+                  : `Praticar até ${item.target} questões`}
             </p>
           </div>
           {item.kind === "learn" ? (
@@ -90,8 +90,8 @@ export default async function Plan() {
       ))}
 
       <nav className="workspace-links">
-        <Link href="/preferencias">Ajustar preferÃªncias</Link>
-        <Link href="/missoes">MissÃµes de hoje</Link>
+        <Link href="/preferencias">Ajustar preferências</Link>
+        <Link href="/missoes">Missões de hoje</Link>
       </nav>
     </>
   );

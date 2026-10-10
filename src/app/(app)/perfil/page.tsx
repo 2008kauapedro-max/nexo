@@ -35,10 +35,10 @@ export default async function Profile() {
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">SUA HISTÃ“RIA ATÃ‰ AQUI</span>
+          <span className="eyebrow">SUA HISTÓRIA ATÉ AQUI</span>
           <h1>{profile.name}</h1>
           <p>
-            {profile.goal} Â· NÃ­vel {levelFromXp(profile.xp)} Â·{" "}
+            {profile.goal} · Nível {levelFromXp(profile.xp)} ·{" "}
             <strong>{plan.name}</strong>
           </p>
         </div>
@@ -47,7 +47,7 @@ export default async function Profile() {
 
       <div className="stat-row">
         <div className="stat">
-          <span>QuestÃµes*</span>
+          <span>Questões*</span>
           <strong>{answered}</strong>
         </div>
         <div className="stat">
@@ -63,7 +63,7 @@ export default async function Profile() {
       </div>
 
       <p className="fine-print">
-        *Ãšltimas 100 sessÃµes. Seu XP inclui todo o histÃ³rico.
+        *Últimas 100 sessões. Seu XP inclui todo o histórico.
       </p>
 
       <div className="section-heading">
@@ -104,7 +104,7 @@ export default async function Profile() {
             </div>
           ))
         ) : (
-          <p>Seu primeiro marco estÃ¡ a uma sessÃ£o de distÃ¢ncia.</p>
+          <p>Seu primeiro marco está a uma sessão de distância.</p>
         )}
       </div>
 
@@ -114,10 +114,10 @@ export default async function Profile() {
 
       <div className="toolbar">
         <Link className="button secondary" href="/configuracoes">
-          ConfiguraÃ§Ãµes
+          Configurações
         </Link>
         <Link className="button secondary" href="/preferencias">
-          Editar preferÃªncias
+          Editar preferências
         </Link>
         <Link className="button secondary" href="/planos">
           Plano {plan.name}
@@ -130,7 +130,7 @@ export default async function Profile() {
               : "/planos?recurso=advanced_reports"
           }
         >
-          RelatÃ³rio avanÃ§ado
+          Relatório avançado
           {!plan.features.advanced_reports && (
             <span className="pill">Premium</span>
           )}
@@ -140,7 +140,7 @@ export default async function Profile() {
         </a>
         {admin && (
           <Link className="button secondary" href="/admin">
-            AdministraÃ§Ã£o
+            Administração
           </Link>
         )}
         <form action={logout}>
@@ -149,7 +149,7 @@ export default async function Profile() {
       </div>
 
       <div className="section-heading">
-        <h2>HistÃ³rico recente</h2>
+        <h2>Histórico recente</h2>
       </div>
 
       {sessions
@@ -158,11 +158,11 @@ export default async function Profile() {
         .map((s) => (
           <Link key={s.id} href={`/resultado/${s.id}`} className="row-card">
             <span>
-              {format.date(s.started_at)} Â·{" "}
+              {format.date(s.started_at)} ·{" "}
               {s.mode === "simulation" ? "Simulado" : "Treino"}
             </span>
             <span>
-              {s.correct}/{s.answered} â†—
+              {s.correct}/{s.answered} ↗
             </span>
           </Link>
         ))}

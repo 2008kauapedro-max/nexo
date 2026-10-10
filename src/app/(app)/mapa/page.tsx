@@ -26,12 +26,12 @@ export default async function Knowledge({
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">PRO Â· O QUE VOCÃŠ JÃ CONECTOU</span>
+          <span className="eyebrow">PRO · O QUE VOCÊ JÁ CONECTOU</span>
           <h1>{subject ? subject.name : "Mapa de conhecimento."}</h1>
           <p>
             {subject
               ? "Explore um assunto por vez."
-              : "Escolha uma matÃ©ria para abrir seu caminho."}
+              : "Escolha uma matéria para abrir seu caminho."}
           </p>
         </div>
       </div>
@@ -39,7 +39,7 @@ export default async function Knowledge({
       {subject ? (
         <>
           <Link href="/mapa" className="text-link">
-            â† Todas as matÃ©rias
+            ← Todas as matérias
           </Link>
           {topics
             ?.filter((t) => t.subject_id === subject.id)
@@ -55,7 +55,7 @@ export default async function Knowledge({
                   </h2>
                   <p>
                     {m
-                      ? `${m.attempts} evidÃªncias de aprendizagem. DomÃ­nio Ã© uma estimativa, nÃ£o uma nota.`
+                      ? `${m.attempts} evidências de aprendizagem. Domínio é uma estimativa, não uma nota.`
                       : "Comece uma atividade para conhecer seu ponto de partida."}
                   </p>
                   {m &&
@@ -67,8 +67,8 @@ export default async function Knowledge({
                     ) <
                       m.score * 0.8 && (
                       <p className="notice">
-                        Este assunto estÃ¡ hÃ¡ algum tempo sem prÃ¡tica. Uma
-                        revisÃ£o curta pode ajudar a consolidar a memÃ³ria.
+                        Este assunto está há algum tempo sem prática. Uma
+                        revisão curta pode ajudar a consolidar a memória.
                       </p>
                     )}
                   {lessons
@@ -79,7 +79,7 @@ export default async function Knowledge({
                         href={`/aprender/${l.id}`}
                         className="row-card"
                       >
-                        {l.title} â†’
+                        {l.title} →
                       </Link>
                     ))}
                 </section>
@@ -94,7 +94,7 @@ export default async function Knowledge({
             href={`/mapa?materia=${s.slug}`}
           >
             <h2>{s.name}</h2>
-            <span>Explorar â†’</span>
+            <span>Explorar →</span>
           </Link>
         ))
       )}

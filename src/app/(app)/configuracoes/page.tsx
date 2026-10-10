@@ -21,7 +21,7 @@ export default async function Settings() {
       icon: Globe2,
     },
     {
-      name: "Conta e seguranÃ§a",
+      name: "Conta e segurança",
       href: "/configuracoes/conta",
       description: "E-mail, senha e acesso",
       icon: ShieldCheck,
@@ -29,11 +29,11 @@ export default async function Settings() {
     {
       name: "Aprendizagem",
       href: "/preferencias",
-      description: "Objetivos, matÃ©rias e meta diÃ¡ria",
+      description: "Objetivos, matérias e meta diária",
       icon: Target,
     },
     {
-      name: "NotificaÃ§Ãµes",
+      name: "Notificações",
       href: "/configuracoes/notificacoes",
       description: "Estudos, conquistas e novidades",
       icon: Bell,
@@ -41,19 +41,19 @@ export default async function Settings() {
     {
       name: "Privacidade e dados",
       href: "/configuracoes/dados",
-      description: "ExportaÃ§Ã£o, privacidade e conta",
+      description: "Exportação, privacidade e conta",
       icon: Database,
     },
     {
       name: "Assinatura",
       href: "/planos",
-      description: "Seu plano, benefÃ­cios e cobranÃ§a",
+      description: "Seu plano, benefícios e cobrança",
       icon: CreditCard,
     },
     {
       name: "Ajuda e sobre",
       href: "/configuracoes/ajuda",
-      description: "Como funciona e informaÃ§Ãµes do produto",
+      description: "Como funciona e informações do produto",
       icon: CircleHelp,
     },
   ];
@@ -63,8 +63,8 @@ export default async function Settings() {
       <div className="page-heading">
         <div>
           <span className="eyebrow">DO SEU JEITO</span>
-          <h1>ConfiguraÃ§Ãµes.</h1>
-          <p>Tudo organizado por assunto, sem caÃ§a ao menu.</p>
+          <h1>Configurações.</h1>
+          <p>Tudo organizado por assunto, sem caça ao menu.</p>
         </div>
       </div>
 

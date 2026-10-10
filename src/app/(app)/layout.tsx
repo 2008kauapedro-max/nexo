@@ -59,7 +59,7 @@ export default async function AppLayout({
               <small>Seu plano</small>
               <strong>{planName}</strong>
             </span>
-            <b>Ã¢â€ â€™</b>
+            <b>→</b>
           </Link>
 
           <form action={logout}>

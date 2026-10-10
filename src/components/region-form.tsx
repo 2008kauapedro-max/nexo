@@ -69,8 +69,8 @@ export function RegionForm({
       <details className="settings-panel advanced-settings">
         <summary>
           <span>
-            <strong>RegiÃ£o e formatos</strong>
-            <small>Fuso horÃ¡rio, datas e localizaÃ§Ã£o regional</small>
+            <strong>Região e formatos</strong>
+            <small>Fuso horário, datas e localização regional</small>
           </span>
           <span>+</span>
         </summary>

@@ -42,18 +42,15 @@ export default async function AdvancedReport() {
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">PREMIUM Ã‚Â· VISÃƒÆ’O COMPLETA</span>
-          <h1>Seu relatÃƒÂ³rio de aprendizagem.</h1>
-          <p>
-            Veja onde vocÃƒÂª avanÃƒÂ§ou e onde vale concentrar o prÃƒÂ³ximo
-            estudo.
-          </p>
+          <span className="eyebrow">PREMIUM · VISÃO COMPLETA</span>
+          <h1>Seu relatório de aprendizagem.</h1>
+          <p>Veja onde você avançou e onde vale concentrar o próximo estudo.</p>
         </div>
       </div>
 
       <div className="stat-row">
         <div className="stat">
-          <span>QuestÃƒÂµes analisadas</span>
+          <span>Questões analisadas</span>
           <strong>{format.number(answered)}</strong>
         </div>
         <div className="stat">
@@ -61,29 +58,29 @@ export default async function AdvancedReport() {
           <strong>{accuracy}%</strong>
         </div>
         <div className="stat">
-          <span>RevisÃƒÂµes pendentes</span>
+          <span>Revisões pendentes</span>
           <strong>{format.number(due)}</strong>
         </div>
       </div>
 
       <div className="two-col report-grid">
         <section className="panel">
-          <span className="eyebrow">ÃƒÅ¡LTIMOS 30 DIAS</span>
+          <span className="eyebrow">ÚLTIMOS 30 DIAS</span>
           <h2>Ritmo recente</h2>
           <p>
             {recentAnswered
-              ? `${recentCorrect}/${recentAnswered} respostas corretas nesse perÃƒÂ­odo.`
-              : "Ainda nÃƒÂ£o hÃƒÂ¡ sessÃƒÂµes concluÃƒÂ­das nos ÃƒÂºltimos 30 dias."}
+              ? `${recentCorrect}/${recentAnswered} respostas corretas nesse período.`
+              : "Ainda não há sessões concluídas nos últimos 30 dias."}
           </p>
         </section>
 
         <section className="panel">
-          <span className="eyebrow">PRÃƒâ€œXIMO FOCO</span>
+          <span className="eyebrow">PRÓXIMO FOCO</span>
           <h2>{weakest?.topics?.name || "Continue estudando"}</h2>
           <p>
             {weakest
-              ? `DomÃƒÂ­nio estimado em ${Math.round(weakest.score)}%.`
-              : "Complete mais atividades para o NEXO identificar seu prÃƒÂ³ximo foco."}
+              ? `Domínio estimado em ${Math.round(weakest.score)}%.`
+              : "Complete mais atividades para o NEXO identificar seu próximo foco."}
           </p>
         </section>
       </div>
@@ -93,8 +90,8 @@ export default async function AdvancedReport() {
           <span className="eyebrow">PONTO FORTE</span>
           <h2>{strongest.topics?.name}</h2>
           <p>
-            DomÃƒÂ­nio estimado em {Math.round(strongest.score)}% com{" "}
-            {strongest.attempts} evidÃƒÂªncias registradas.
+            Domínio estimado em {Math.round(strongest.score)}% com{" "}
+            {strongest.attempts} evidências registradas.
           </p>
         </section>
       )}
