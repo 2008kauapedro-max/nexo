@@ -128,9 +128,13 @@ export async function POST(request: Request) {
   <body style="margin:0;background:#070707;color:#fff;font-family:system-ui,sans-serif">
     <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
       <div style="text-align:center">
-        <div style="width:52px;height:52px;margin:0 auto 20px;border-radius:16px;background:#111;border:1px solid #242424;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#b8ff32">
-          N
-        </div>
+        <img
+          src="https://nexoteensina.vercel.app/icon-512.png"
+          alt="NEXO"
+          width="56"
+          height="56"
+          style="width:56px;height:56px;margin:0 auto 20px;display:block;border-radius:16px"
+        />
 
         <h1 style="margin:0 0 10px;font-size:22px;font-weight:750">
           Abrindo pagamento seguro
