@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { currentIdentity } from "@/lib/supabase";
 import { adminDb } from "@/lib/admin-db";
-import { stripeClient, stripePriceFor, type PaidPlanId } from "@/lib/stripe";
+import {
+  asaasCheckoutUrl,
+  asaasNextDueDate,
+  asaasRequest,
+  type PaidPlanId,
+} from "@/lib/asaas";
+import { isSameOriginRequest } from "@/domain/request-origin";
 
 function target(request: Request, path: string) {
   const configured = process.env.NEXT_PUBLIC_APP_URL;
@@ -12,21 +18,15 @@ function target(request: Request, path: string) {
   return new URL(path, base);
 }
 
-function sameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  return !origin || origin === new URL(request.url).origin;
-}
-
 export async function POST(request: Request) {
-  if (!sameOrigin(request))
+  if (!isSameOriginRequest(request))
     return Response.json({ error: "Forbidden." }, { status: 403 });
 
-  const { user } = await currentIdentity();
+  const { db, user } = await currentIdentity();
   if (!user) return Response.redirect(target(request, "/entrar"), 303);
 
-  const stripe = stripeClient();
   const admin = adminDb();
-  if (!stripe || !admin)
+  if (!admin || !process.env.ASAAS_API_KEY)
     return Response.redirect(target(request, "/planos?erro=config"), 303);
 
   const form = await request.formData();
@@ -34,16 +34,29 @@ export async function POST(request: Request) {
   if (!parsed.success)
     return Response.redirect(target(request, "/planos?erro=plano"), 303);
 
-  const plan = parsed.data as PaidPlanId;
-  const price = stripePriceFor(plan);
-  if (!price)
-    return Response.redirect(target(request, "/planos?erro=config"), 303);
+  const planId = parsed.data as PaidPlanId;
 
-  const { data: existing } = await admin
-    .from("subscriptions")
-    .select("*")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const [{ data: plan, error: planError }, { data: existing }] =
+    await Promise.all([
+      db
+        .from("plans")
+        .select("id,name,monthly_price_cents,currency")
+        .eq("id", planId)
+        .single(),
+      admin
+        .from("subscriptions")
+        .select("plan_id,status,period_end")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
+
+  if (planError || !plan)
+    return Response.redirect(target(request, "/planos?erro=plano"), 303);
+
+  const monthlyPriceCents = plan.monthly_price_cents;
+
+  if (monthlyPriceCents == null || monthlyPriceCents <= 0)
+    return Response.redirect(target(request, "/planos?erro=plano"), 303);
 
   const alreadyPaid =
     existing &&
@@ -51,49 +64,64 @@ export async function POST(request: Request) {
     new Date(existing.period_end).getTime() > Date.now();
 
   if (alreadyPaid)
-    return Response.redirect(target(request, "/planos?gerenciar=1"), 303);
+    return Response.redirect(target(request, "/assinatura"), 303);
 
-  let customer = existing?.provider_customer_reference as string | undefined;
+  let checkout: { id: string } | null = null;
 
-  if (!customer) {
-    const created = await stripe.customers.create({
-      email: user.email || undefined,
-      metadata: { nexo_user_id: user.id },
+  try {
+    checkout = await asaasRequest<{ id: string }>("/checkouts", {
+      method: "POST",
+      body: JSON.stringify({
+        billingTypes: ["CREDIT_CARD"],
+        chargeTypes: ["RECURRENT"],
+        minutesToExpire: 60,
+        externalReference: `nexo:${user.id}:${planId}`,
+        callback: {
+          successUrl: target(request, "/planos?checkout=sucesso").toString(),
+          cancelUrl: target(request, "/planos?checkout=cancelado").toString(),
+          expiredUrl: target(request, "/planos?checkout=expirado").toString(),
+        },
+        items: [
+          {
+            name: `NEXO ${plan.name}`,
+            description: `Assinatura mensal do plano ${plan.name}`,
+            quantity: 1,
+            value: monthlyPriceCents / 100,
+          },
+        ],
+        subscription: {
+          cycle: "MONTHLY",
+          nextDueDate: asaasNextDueDate(),
+        },
+      }),
     });
-    customer = created.id;
 
-    if (existing) {
-      await admin
-        .from("subscriptions")
-        .update({ provider_customer_reference: customer })
-        .eq("user_id", user.id);
-    } else {
-      await admin.from("subscriptions").insert({
-        user_id: user.id,
-        plan_id: plan,
-        status: "pending",
-        provider_customer_reference: customer,
-        period_end: new Date().toISOString(),
-      });
+    if (!checkout?.id) throw new Error("ASAAS_NO_CHECKOUT_ID");
+
+    const { error: recordError } = await admin.rpc("record_asaas_checkout", {
+      p_checkout_id: checkout.id,
+      p_user: user.id,
+      p_plan: planId,
+      p_amount_cents: monthlyPriceCents,
+    });
+
+    if (recordError) {
+      try {
+        await asaasRequest(`/checkouts/${encodeURIComponent(checkout.id)}`, {
+          method: "DELETE",
+        });
+      } catch {}
+      throw recordError;
     }
-  }
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer,
-    line_items: [{ price, quantity: 1 }],
-    allow_promotion_codes: true,
-    client_reference_id: user.id,
-    metadata: { nexo_user_id: user.id, plan_id: plan },
-    subscription_data: {
-      metadata: { nexo_user_id: user.id, plan_id: plan },
-    },
-    success_url: target(request, "/planos?checkout=sucesso").toString(),
-    cancel_url: target(request, "/planos?checkout=cancelado").toString(),
-  });
-
-  if (!session.url)
+    return Response.redirect(asaasCheckoutUrl(checkout.id), 303);
+  } catch (error) {
+    console.error("Failed to create Asaas checkout", {
+      userId: user.id,
+      planId,
+      checkoutId: checkout?.id,
+      error: error instanceof Error ? error.message : "unknown",
+    });
     return Response.redirect(target(request, "/planos?erro=checkout"), 303);
-
-  return Response.redirect(session.url, 303);
+  }
 }

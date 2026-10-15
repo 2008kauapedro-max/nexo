@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { getRegionalFormats } from "@/i18n/server-format";
 import { planSchema } from "@/domain/plans";
 import { getCurrentPlanAccess } from "@/lib/plan-access";
-import { stripeBillingReady } from "@/lib/stripe";
+import { asaasBillingReady } from "@/lib/asaas";
 
 const highlights: Record<string, string[]> = {
   free: ["saved_help", "basic_review", "daily_plan"],
@@ -45,7 +45,7 @@ export default async function Plans({
   if (error) throw error;
 
   const plans = planSchema.array().parse(data);
-  const billingReady = stripeBillingReady();
+  const billingReady = asaasBillingReady();
 
   return (
     <>
