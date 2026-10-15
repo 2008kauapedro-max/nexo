@@ -32,10 +32,12 @@ E2E autenticados exigem contas QA isoladas em `.local/qa-users.json` (array de o
 ## Ambiente e credenciais
 Obrigatórias: `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Copie os nomes e valores vazios de `.env.example`. Local: APP_URL `http://localhost:3000`.
 
-Ainda faltam: `GROQ_API_KEY` e `SUPABASE_SECRET_KEY` (NEXO, somente servidor); opcional `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (secret do CAPTCHA no painel Auth); SMTP próprio no Supabase (host, porta, usuário, senha, remetente e DNS). Mantenha `BILLING_PROVIDER=disabled`; `BILLING_WEBHOOK_SECRET` só quando houver integração de cobrança real. Não usar AI_MODEL/AI_BASE_URL: modelo único `openai/gpt-oss-20b` já definido.
+Ainda faltam: `GROQ_API_KEY` e `SUPABASE_SECRET_KEY` (NEXO, somente servidor); opcional `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (secret do CAPTCHA no painel Auth); SMTP próprio no Supabase (host, porta, usuário, senha, remetente e DNS). A integração Stripe já existe no código e requer `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_MONTHLY_PRICE_ID`, `STRIPE_PREMIUM_MONTHLY_PRICE_ID` e a mesma `SUPABASE_SECRET_KEY`. Os antigos `BILLING_PROVIDER`/`BILLING_WEBHOOK_SECRET` não ativam essa integração. Não usar AI_MODEL/AI_BASE_URL: modelo único `openai/gpt-oss-20b` já definido.
 
 ## Pendências reais
-SMTP e entrega de emails; Groq real; CAPTCHA; proteção contra senhas vazadas; aprovação, backup/restauração e teste descartável antes de habilitar exclusão definitiva. OAuth de reautenticação apenas se um provedor for ativado futuramente. Pagamentos permanecem indisponíveis. Não aplicar `docs/pending-sql/*` automaticamente.
+SMTP e entrega de emails; Groq real; CAPTCHA; proteção contra senhas vazadas; aprovação, backup/restauração e teste descartável antes de habilitar exclusão definitiva. OAuth de reautenticação apenas se um provedor for ativado futuramente. Stripe aguarda credenciais, preços, webhook e validação real antes de vender planos. Não aplicar `docs/pending-sql/*` automaticamente.
+
+Se o Supabase estiver INACTIVE/pausado, use Resume project no projeto NEXO existente; não recrie o banco nem rode reset. Em 14/10 a auditoria encontrou essa condição e solicitou a retomada sem alterações de schema/dados. O plano gratuito pode sofrer pausas; monitore o estado antes de diagnosticar falhas de login como defeito do aplicativo.
 
 ## Deploy e Git
 Somente `2008kauapedro-max/nexo`, branch `main`, projeto Vercel `nexo`. Push dispara deploy Git; conferir READY e smoke tests antes de considerar entregue.

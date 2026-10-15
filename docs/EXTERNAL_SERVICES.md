@@ -30,5 +30,7 @@ Após salvar, criar novo deployment. Testar respostas reais, dica sem gabarito, 
 
 ## Cobrança
 
-Permanece desativada em produção. Existe contrato de webhook assinado restrito a desenvolvimento, com HMAC, janela de tempo, deduplicação e ordenação de eventos. Isso não equivale a integrar um gateway comercial. Checkout, estornos, conciliação e eventos reais de assinatura precisam de provedor e testes próprios antes da liberação.
+Atualização do handoff de 14/10/2026: os commits posteriores implementaram Stripe Checkout, portal e webhook em `/api/billing/checkout`, `/api/billing/portal` e `/api/billing/webhook`. A integração verifica assinatura Stripe e aplica eventos no banco; não confundir com o antigo contrato HMAC de desenvolvimento.
+
+Ainda faltam na Vercel NEXO: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_MONTHLY_PRICE_ID`, `STRIPE_PREMIUM_MONTHLY_PRICE_ID` e `SUPABASE_SECRET_KEY` exclusiva do NEXO. Configurar os preços mensais correspondentes e o endpoint do webhook no Stripe; testar primeiro em modo de teste, incluindo repetição/ordem de eventos, cancelamento e falha de pagamento. Nunca misturar chaves/preços de teste e produção. `BILLING_PROVIDER` e `BILLING_WEBHOOK_SECRET` antigos não habilitam o código atual. Sem configuração, o checkout permanece indisponível; nenhuma cobrança real foi validada nesta entrega.
 
