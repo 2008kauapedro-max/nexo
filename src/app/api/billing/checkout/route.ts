@@ -114,7 +114,35 @@ export async function POST(request: Request) {
       throw recordError;
     }
 
-    return Response.redirect(asaasCheckoutUrl(checkout.id), 303);
+    const checkoutUrl = asaasCheckoutUrl(checkout.id);
+
+    return new Response(
+      `<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="refresh" content="0;url=${checkoutUrl}" />
+    <title>Abrindo pagamento seguro...</title>
+  </head>
+  <body>
+    <main style="font-family:system-ui,sans-serif;max-width:560px;margin:64px auto;padding:24px;text-align:center">
+      <h1>Abrindo pagamento seguro...</h1>
+      <p>Você será redirecionado para o checkout do Asaas.</p>
+      <p><a href="${checkoutUrl}">Continuar para o pagamento</a></p>
+    </main>
+    <script>window.location.replace(${JSON.stringify(checkoutUrl)});</script>
+  </body>
+</html>`,
+      {
+        status: 200,
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "no-store, max-age=0",
+          "referrer-policy": "no-referrer",
+        },
+      },
+    );
   } catch (error) {
     console.error("Failed to create Asaas checkout", {
       userId: user.id,
