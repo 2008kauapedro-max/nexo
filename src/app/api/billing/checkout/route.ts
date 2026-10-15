@@ -125,12 +125,37 @@ export async function POST(request: Request) {
     <meta http-equiv="refresh" content="0;url=${checkoutUrl}" />
     <title>Abrindo pagamento seguro...</title>
   </head>
-  <body>
-    <main style="font-family:system-ui,sans-serif;max-width:560px;margin:64px auto;padding:24px;text-align:center">
-      <h1>Abrindo pagamento seguro...</h1>
-      <p>Você será redirecionado para o checkout do Asaas.</p>
-      <p><a href="${checkoutUrl}">Continuar para o pagamento</a></p>
+  <body style="margin:0;background:#070707;color:#fff;font-family:system-ui,sans-serif">
+    <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="text-align:center">
+        <div style="width:52px;height:52px;margin:0 auto 20px;border-radius:16px;background:#111;border:1px solid #242424;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#b8ff32">
+          N
+        </div>
+
+        <h1 style="margin:0 0 10px;font-size:22px;font-weight:750">
+          Abrindo pagamento seguro
+        </h1>
+
+        <p style="margin:0;color:#999;font-size:14px">
+          Conectando você ao checkout protegido do Asaas.
+        </p>
+
+        <div style="width:34px;height:34px;margin:24px auto 0;border:3px solid #222;border-top-color:#b8ff32;border-radius:50%;animation:spin .8s linear infinite"></div>
+
+        <p style="margin-top:24px">
+          <a href="${checkoutUrl}" style="color:#b8ff32;text-decoration:none;font-size:13px">
+            Continuar manualmente
+          </a>
+        </p>
+      </div>
     </main>
+
+    <style>
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+
     <script>window.location.replace(${JSON.stringify(checkoutUrl)});</script>
   </body>
 </html>`,
