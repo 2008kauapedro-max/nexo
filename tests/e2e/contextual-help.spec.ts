@@ -76,6 +76,9 @@ for (const width of [390, 1440])
     await page.goto("/ia");
     await expect(page).toHaveURL(/estudar$/);
     await page.goto("/planos");
+    // Streaming can briefly retain both the loading fallback and page content.
+    await expect(page.locator("main")).toHaveCount(1);
+    await expect(page.locator("main.loading-screen")).toHaveCount(0);
     await expect(page.locator("main")).toContainText("24,90");
     await expect(page.locator("main")).toContainText("44,90");
     await expect(page.locator("main")).toContainText("5 ajudas");
